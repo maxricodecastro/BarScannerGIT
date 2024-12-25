@@ -3,6 +3,8 @@ import SwiftUI
 
 struct CameraView: UIViewControllerRepresentable {
     @State private var isAuthorized = false
+    @State private var showAlert = false
+    @State private var errorMessage = ""
     
     class Coordinator: NSObject {
         var parent: CameraView
@@ -13,42 +15,56 @@ struct CameraView: UIViewControllerRepresentable {
         }
         
         func setupCaptureSession() {
-            // Check camera authorization status
             switch AVCaptureDevice.authorizationStatus(for: .video) {
             case .authorized:
-                DispatchQueue.global(qos: .userInitiated).async {
-                    self.setupCamera()
-                }
+                setupCamera()
             case .notDetermined:
                 AVCaptureDevice.requestAccess(for: .video) { granted in
                     if granted {
-                        DispatchQueue.global(qos: .userInitiated).async {
-                            self.setupCamera()
-                        }
+                        self.setupCamera()
+                    } else {
+                        self.handleError("Camera access denied")
                     }
                 }
-            default:
-                return
+            case .denied, .restricted:
+                handleError("Camera access denied")
+            @unknown default:
+                handleError("Unknown camera authorization status")
+            }
+        }
+        
+        private func handleError(_ message: String) {
+            DispatchQueue.main.async {
+                self.parent.errorMessage = message
+                self.parent.showAlert = true
             }
         }
         
         private func setupCamera() {
-            let captureSession = AVCaptureSession()
-            captureSession.beginConfiguration()
+            let session = AVCaptureSession()
+            self.captureSession = session
             
-            guard let backCamera = AVCaptureDevice.default(for: .video) else { return }
-            do {
-                let input = try AVCaptureDeviceInput(device: backCamera)
-                if captureSession.canAddInput(input) {
-                    captureSession.addInput(input)
-                }
-            } catch {
-                print("Error setting up camera: \(error.localizedDescription)")
+            session.beginConfiguration()
+            
+            guard let videoDevice = AVCaptureDevice.default(for: .video) else {
+                handleError("Unable to access camera")
                 return
             }
             
-            captureSession.commitConfiguration()
-            self.captureSession = captureSession
+            do {
+                let videoInput = try AVCaptureDeviceInput(device: videoDevice)
+                if session.canAddInput(videoInput) {
+                    session.addInput(videoInput)
+                }
+                
+                session.commitConfiguration()
+                
+                DispatchQueue.global(qos: .userInitiated).async {
+                    session.startRunning()
+                }
+            } catch {
+                handleError("Error setting up camera: \(error.localizedDescription)")
+            }
         }
     }
     
@@ -58,21 +74,16 @@ struct CameraView: UIViewControllerRepresentable {
     
     func makeUIViewController(context: Context) -> UIViewController {
         let viewController = UIViewController()
-        context.coordinator.setupCaptureSession()
         
-        guard let captureSession = context.coordinator.captureSession else {
-            return viewController
-        }
-        
-        let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        viewController.view.backgroundColor = .black
-        
-        previewLayer.frame = viewController.view.bounds
-        previewLayer.videoGravity = .resizeAspectFill
-        viewController.view.layer.addSublayer(previewLayer)
-        
-        DispatchQueue.global(qos: .userInitiated).async {
-            captureSession.startRunning()
+        DispatchQueue.main.async {
+            context.coordinator.setupCaptureSession()
+            
+            if let session = context.coordinator.captureSession {
+                let previewLayer = AVCaptureVideoPreviewLayer(session: session)
+                previewLayer.videoGravity = .resizeAspectFill
+                previewLayer.frame = viewController.view.bounds
+                viewController.view.layer.addSublayer(previewLayer)
+            }
         }
         
         return viewController
@@ -90,7 +101,9 @@ struct CameraView: UIViewControllerRepresentable {
 }
 
 struct CameraViewWithOverlay: View {
-    // Configurable parameters
+    @State private var showAlert = false
+    @State private var errorMessage = ""
+    
     private let rectangleWidth: CGFloat = UIScreen.main.bounds.width * 0.6
     private let rectangleHeight: CGFloat = UIScreen.main.bounds.width * 0.36
     private let strokeWidth: CGFloat = 6
@@ -99,7 +112,12 @@ struct CameraViewWithOverlay: View {
     var body: some View {
         ZStack {
             CameraView()
-                .ignoresSafeArea(.all, edges: .top)
+                .ignoresSafeArea()
+                .alert("Camera Error", isPresented: $showAlert) {
+                    Button("OK", role: .cancel) { }
+                } message: {
+                    Text(errorMessage)
+                }
             
             Rectangle()
                 .stroke(strokeColor, lineWidth: strokeWidth)
