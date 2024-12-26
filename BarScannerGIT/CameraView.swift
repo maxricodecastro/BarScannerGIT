@@ -1,72 +1,61 @@
 import AVFoundation
 import SwiftUI
 
-struct CameraView: UIViewControllerRepresentable {
-    @State private var isAuthorized = false
-    @State private var showAlert = false
-    @State private var errorMessage = ""
+// MARK: - Camera View Model
+final class CameraViewModel: ObservableObject {
+    @Published var scannedBarcode = ""
+    @Published var productName = "Scan a product"
+    @Published var showAlert = false
+    @Published var errorMessage = ""
+    @Published var isScanning = true
     
-    class Coordinator: NSObject {
-        var parent: CameraView
-        var captureSession: AVCaptureSession?
+    private let barcodeService: BarcodeServiceProtocol
+    
+    init(barcodeService: BarcodeServiceProtocol = BarcodeService()) {
+        self.barcodeService = barcodeService
+        print("CameraViewModel initialized")
+    }
+    
+    func handleScannedBarcode(_ barcode: String) {
+        guard isScanning else { return }
         
-        init(_ parent: CameraView) {
-            self.parent = parent
-        }
+        print("Handling barcode: \(barcode)")
+        scannedBarcode = barcode
+        isScanning = false
         
-        func setupCaptureSession() {
-            switch AVCaptureDevice.authorizationStatus(for: .video) {
-            case .authorized:
-                setupCamera()
-            case .notDetermined:
-                AVCaptureDevice.requestAccess(for: .video) { granted in
-                    if granted {
-                        self.setupCamera()
-                    } else {
-                        self.handleError("Camera access denied")
-                    }
-                }
-            case .denied, .restricted:
-                handleError("Camera access denied")
-            @unknown default:
-                handleError("Unknown camera authorization status")
-            }
-        }
-        
-        private func handleError(_ message: String) {
-            DispatchQueue.main.async {
-                self.parent.errorMessage = message
-                self.parent.showAlert = true
-            }
-        }
-        
-        private func setupCamera() {
-            let session = AVCaptureSession()
-            self.captureSession = session
-            
-            session.beginConfiguration()
-            
-            guard let videoDevice = AVCaptureDevice.default(for: .video) else {
-                handleError("Unable to access camera")
-                return
-            }
-            
+        Task { @MainActor in
             do {
-                let videoInput = try AVCaptureDeviceInput(device: videoDevice)
-                if session.canAddInput(videoInput) {
-                    session.addInput(videoInput)
-                }
+                print("Fetching product info for barcode: \(barcode)")
+                let info = try await barcodeService.fetchProductInfo(barcode: barcode)
                 
-                session.commitConfiguration()
+                // Build product name from available information
+                let productInfo = [
+                    info.brand,
+                    info.title,
+                    info.description
+                ].compactMap { $0 }.joined(separator: " - ")
                 
-                DispatchQueue.global(qos: .userInitiated).async {
-                    session.startRunning()
-                }
+                self.productName = productInfo.isEmpty ? "Product details not found" : productInfo
+                print("Updated product name to: \(self.productName)")
             } catch {
-                handleError("Error setting up camera: \(error.localizedDescription)")
+                print("Error occurred: \(error)")
+                self.showAlert = true
+                self.errorMessage = "Error fetching product: \(error.localizedDescription)"
+                self.isScanning = true
             }
         }
     }
+    
+    func resetScanner() {
+        isScanning = true
+        scannedBarcode = ""
+        productName = "Scan a product"
+    }
+}
+
+// MARK: - Camera View
+struct CameraView: UIViewControllerRepresentable {
+    @ObservedObject var viewModel: CameraViewModel
     
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -74,56 +63,166 @@ struct CameraView: UIViewControllerRepresentable {
     
     func makeUIViewController(context: Context) -> UIViewController {
         let viewController = UIViewController()
-        
-        DispatchQueue.main.async {
-            context.coordinator.setupCaptureSession()
-            
-            if let session = context.coordinator.captureSession {
-                let previewLayer = AVCaptureVideoPreviewLayer(session: session)
-                previewLayer.videoGravity = .resizeAspectFill
-                previewLayer.frame = viewController.view.bounds
-                viewController.view.layer.addSublayer(previewLayer)
-            }
-        }
-        
+        context.coordinator.setupCamera(in: viewController)
         return viewController
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
-        if let previewLayer = uiViewController.view.layer.sublayers?.first as? AVCaptureVideoPreviewLayer {
-            previewLayer.frame = uiViewController.view.bounds
-        }
-    }
-    
-    static func dismantleUIViewController(_ uiViewController: UIViewController, coordinator: Coordinator) {
-        coordinator.captureSession?.stopRunning()
+        context.coordinator.updatePreviewLayer(in: uiViewController)
     }
 }
 
+// MARK: - Camera Coordinator
+extension CameraView {
+    final class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
+        private let parent: CameraView
+        private var captureSession: AVCaptureSession?
+        private var previewLayer: AVCaptureVideoPreviewLayer?
+        
+        init(_ parent: CameraView) {
+            self.parent = parent
+            super.init()
+        }
+        
+        func setupCamera(in viewController: UIViewController) {
+            let session = AVCaptureSession()
+            captureSession = session
+            
+            guard let videoDevice = AVCaptureDevice.default(for: .video),
+                  let videoInput = try? AVCaptureDeviceInput(device: videoDevice) else {
+                handleError("Unable to access camera")
+                return
+            }
+            
+            guard session.canAddInput(videoInput) else {
+                handleError("Unable to add camera input")
+                return
+            }
+            
+            session.addInput(videoInput)
+            
+            let metadataOutput = AVCaptureMetadataOutput()
+            guard session.canAddOutput(metadataOutput) else {
+                handleError("Unable to add metadata output")
+                return
+            }
+            
+            session.addOutput(metadataOutput)
+            metadataOutput.setMetadataObjectsDelegate(self, queue: .main)
+            metadataOutput.metadataObjectTypes = [.ean8, .ean13, .upce, .code128]
+            
+            let previewLayer = AVCaptureVideoPreviewLayer(session: session)
+            self.previewLayer = previewLayer
+            previewLayer.frame = viewController.view.layer.bounds
+            previewLayer.videoGravity = .resizeAspectFill
+            viewController.view.layer.addSublayer(previewLayer)
+            
+            DispatchQueue.global(qos: .userInitiated).async {
+                session.startRunning()
+            }
+        }
+        
+        func updatePreviewLayer(in viewController: UIViewController) {
+            previewLayer?.frame = viewController.view.layer.bounds
+        }
+        
+        private func handleError(_ message: String) {
+            parent.viewModel.errorMessage = message
+            parent.viewModel.showAlert = true
+        }
+        
+        func metadataOutput(_ output: AVCaptureMetadataOutput,
+                           didOutput metadataObjects: [AVMetadataObject],
+                           from connection: AVCaptureConnection) {
+            guard let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
+                  let barcodeValue = metadataObject.stringValue else { return }
+            
+            parent.viewModel.handleScannedBarcode(barcodeValue)
+        }
+    }
+}
+
+// MARK: - Camera View With Overlay
 struct CameraViewWithOverlay: View {
-    @State private var showAlert = false
-    @State private var errorMessage = ""
+    @StateObject private var viewModel = CameraViewModel()
     
-    private let rectangleWidth: CGFloat = UIScreen.main.bounds.width * 0.6
-    private let rectangleHeight: CGFloat = UIScreen.main.bounds.width * 0.36
-    private let strokeWidth: CGFloat = 6
-    private let strokeColor: Color = .white
+    private let scannerOverlay = ScannerOverlay()
     
     var body: some View {
         ZStack {
-            CameraView()
-                .ignoresSafeArea()
-                .alert("Camera Error", isPresented: $showAlert) {
-                    Button("OK", role: .cancel) { }
-                } message: {
-                    Text(errorMessage)
-                }
+            CameraView(viewModel: viewModel)
+                .edgesIgnoringSafeArea(.all)
             
-            Rectangle()
-                .stroke(strokeColor, lineWidth: strokeWidth)
-                .frame(width: rectangleWidth, height: rectangleHeight)
-                .background(Color.clear)
+            VStack {
+                ProductNameHeader(name: viewModel.productName)
+                Spacer()
+                scannerOverlay
+                Spacer()
+                if !viewModel.scannedBarcode.isEmpty {
+                    VStack {
+                        BarcodeFooter(code: viewModel.scannedBarcode)
+                        Button("Scan Again") {
+                            viewModel.resetScanner()
+                        }
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .padding(.bottom, 20)
+                    }
+                }
+            }
         }
+        .alert("Camera Error", isPresented: $viewModel.showAlert) {
+            Button("OK", role: .cancel) { 
+                viewModel.resetScanner()
+            }
+        } message: {
+            Text(viewModel.errorMessage)
+        }
+    }
+}
+
+// MARK: - UI Components
+private struct ProductNameHeader: View {
+    let name: String
+    
+    var body: some View {
+        Text(name)
+            .font(.title2)
+            .padding()
+            .background(Color.black.opacity(0.7))
+            .foregroundColor(.white)
+            .cornerRadius(10)
+            .padding(.top, 50)
+            .multilineTextAlignment(.center)
+            .animation(.easeInOut, value: name)
+    }
+}
+
+private struct ScannerOverlay: View {
+    var body: some View {
+        Rectangle()
+            .stroke(Color.white, lineWidth: 6)
+            .frame(
+                width: UIScreen.main.bounds.width * 0.6,
+                height: UIScreen.main.bounds.width * 0.36
+            )
+            .background(Color.clear)
+    }
+}
+
+private struct BarcodeFooter: View {
+    let code: String
+    
+    var body: some View {
+        Text("Barcode: \(code)")
+            .font(.title3)
+            .padding()
+            .background(Color.black.opacity(0.7))
+            .foregroundColor(.white)
+            .cornerRadius(10)
+            .padding(.bottom, 50)
     }
 }
 
