@@ -1,0 +1,6 @@
+framework module Pods_BarScannerGIT_BarScannerGITUITests {
+  umbrella header "Pods-BarScannerGIT-BarScannerGITUITests-umbrella.h"
+
+  export *
+  module * { export * }
+}

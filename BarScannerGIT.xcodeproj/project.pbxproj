@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		6821CEE89971EBA4671B3EC0 /* Pods_BarScannerGITTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7BEF5D2EB0B38D3DAE9068DC /* Pods_BarScannerGITTests.framework */; };
+		B4508583C3AE1B03B6EF9F3C /* Pods_BarScannerGIT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0560440DE2170FA5D90F3676 /* Pods_BarScannerGIT.framework */; };
+		E24ACA38AD25A1334932B0CC /* Pods_BarScannerGIT_BarScannerGITUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8A52D87F8F847ABAF1F8A4B /* Pods_BarScannerGIT_BarScannerGITUITests.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		0C849F9E2D1BF3A0009CF9F6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,9 +30,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		037BB0BDBD272DC8BC6F5BFD /* Pods-BarScannerGITTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BarScannerGITTests.release.xcconfig"; path = "Target Support Files/Pods-BarScannerGITTests/Pods-BarScannerGITTests.release.xcconfig"; sourceTree = "<group>"; };
+		0560440DE2170FA5D90F3676 /* Pods_BarScannerGIT.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BarScannerGIT.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C849F8D2D1BF39F009CF9F6 /* BarScannerGIT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BarScannerGIT.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C849F9D2D1BF3A0009CF9F6 /* BarScannerGITTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BarScannerGITTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C849FA72D1BF3A0009CF9F6 /* BarScannerGITUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BarScannerGITUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4893C660BA1CE636DF28D591 /* Pods-BarScannerGIT-BarScannerGITUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BarScannerGIT-BarScannerGITUITests.release.xcconfig"; path = "Target Support Files/Pods-BarScannerGIT-BarScannerGITUITests/Pods-BarScannerGIT-BarScannerGITUITests.release.xcconfig"; sourceTree = "<group>"; };
+		550183E8C4BBE72E793C3046 /* Pods-BarScannerGIT.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BarScannerGIT.debug.xcconfig"; path = "Target Support Files/Pods-BarScannerGIT/Pods-BarScannerGIT.debug.xcconfig"; sourceTree = "<group>"; };
+		5AA71EF57049E924DC1AE0A6 /* Pods-BarScannerGIT.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BarScannerGIT.release.xcconfig"; path = "Target Support Files/Pods-BarScannerGIT/Pods-BarScannerGIT.release.xcconfig"; sourceTree = "<group>"; };
+		5B552557AC668990BDB9D141 /* Pods-BarScannerGIT-BarScannerGITUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BarScannerGIT-BarScannerGITUITests.debug.xcconfig"; path = "Target Support Files/Pods-BarScannerGIT-BarScannerGITUITests/Pods-BarScannerGIT-BarScannerGITUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		7BEF5D2EB0B38D3DAE9068DC /* Pods_BarScannerGITTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BarScannerGITTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8BC1EAF7F249BE467CD63C81 /* Pods-BarScannerGITTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BarScannerGITTests.debug.xcconfig"; path = "Target Support Files/Pods-BarScannerGITTests/Pods-BarScannerGITTests.debug.xcconfig"; sourceTree = "<group>"; };
+		D8A52D87F8F847ABAF1F8A4B /* Pods_BarScannerGIT_BarScannerGITUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BarScannerGIT_BarScannerGITUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -52,6 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B4508583C3AE1B03B6EF9F3C /* Pods_BarScannerGIT.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -59,6 +75,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6821CEE89971EBA4671B3EC0 /* Pods_BarScannerGITTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -66,6 +83,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E24ACA38AD25A1334932B0CC /* Pods_BarScannerGIT_BarScannerGITUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -79,6 +97,8 @@
 				0C849FA02D1BF3A0009CF9F6 /* BarScannerGITTests */,
 				0C849FAA2D1BF3A0009CF9F6 /* BarScannerGITUITests */,
 				0C849F8E2D1BF39F009CF9F6 /* Products */,
+				B0C0CFC970B85212509DB9A1 /* Pods */,
+				CF8A84DF091A2CD5B9EF377A /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -92,6 +112,29 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		B0C0CFC970B85212509DB9A1 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				550183E8C4BBE72E793C3046 /* Pods-BarScannerGIT.debug.xcconfig */,
+				5AA71EF57049E924DC1AE0A6 /* Pods-BarScannerGIT.release.xcconfig */,
+				5B552557AC668990BDB9D141 /* Pods-BarScannerGIT-BarScannerGITUITests.debug.xcconfig */,
+				4893C660BA1CE636DF28D591 /* Pods-BarScannerGIT-BarScannerGITUITests.release.xcconfig */,
+				8BC1EAF7F249BE467CD63C81 /* Pods-BarScannerGITTests.debug.xcconfig */,
+				037BB0BDBD272DC8BC6F5BFD /* Pods-BarScannerGITTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		CF8A84DF091A2CD5B9EF377A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0560440DE2170FA5D90F3676 /* Pods_BarScannerGIT.framework */,
+				D8A52D87F8F847ABAF1F8A4B /* Pods_BarScannerGIT_BarScannerGITUITests.framework */,
+				7BEF5D2EB0B38D3DAE9068DC /* Pods_BarScannerGITTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -99,6 +142,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0C849FB12D1BF3A0009CF9F6 /* Build configuration list for PBXNativeTarget "BarScannerGIT" */;
 			buildPhases = (
+				4C1555581F2E76C7C7D3F23F /* [CP] Check Pods Manifest.lock */,
 				0C849F892D1BF39F009CF9F6 /* Sources */,
 				0C849F8A2D1BF39F009CF9F6 /* Frameworks */,
 				0C849F8B2D1BF39F009CF9F6 /* Resources */,
@@ -111,8 +155,6 @@
 				0C849F8F2D1BF39F009CF9F6 /* BarScannerGIT */,
 			);
 			name = BarScannerGIT;
-			packageProductDependencies = (
-			);
 			productName = BarScannerGIT;
 			productReference = 0C849F8D2D1BF39F009CF9F6 /* BarScannerGIT.app */;
 			productType = "com.apple.product-type.application";
@@ -121,6 +163,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0C849FB42D1BF3A0009CF9F6 /* Build configuration list for PBXNativeTarget "BarScannerGITTests" */;
 			buildPhases = (
+				D100F7A517CDA765AD3F98EF /* [CP] Check Pods Manifest.lock */,
 				0C849F992D1BF3A0009CF9F6 /* Sources */,
 				0C849F9A2D1BF3A0009CF9F6 /* Frameworks */,
 				0C849F9B2D1BF3A0009CF9F6 /* Resources */,
@@ -134,8 +177,6 @@
 				0C849FA02D1BF3A0009CF9F6 /* BarScannerGITTests */,
 			);
 			name = BarScannerGITTests;
-			packageProductDependencies = (
-			);
 			productName = BarScannerGITTests;
 			productReference = 0C849F9D2D1BF3A0009CF9F6 /* BarScannerGITTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -144,6 +185,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0C849FB72D1BF3A0009CF9F6 /* Build configuration list for PBXNativeTarget "BarScannerGITUITests" */;
 			buildPhases = (
+				77EDC1DC2233C408CCCD1DE4 /* [CP] Check Pods Manifest.lock */,
 				0C849FA32D1BF3A0009CF9F6 /* Sources */,
 				0C849FA42D1BF3A0009CF9F6 /* Frameworks */,
 				0C849FA52D1BF3A0009CF9F6 /* Resources */,
@@ -157,8 +199,6 @@
 				0C849FAA2D1BF3A0009CF9F6 /* BarScannerGITUITests */,
 			);
 			name = BarScannerGITUITests;
-			packageProductDependencies = (
-			);
 			productName = BarScannerGITUITests;
 			productReference = 0C849FA72D1BF3A0009CF9F6 /* BarScannerGITUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -230,6 +270,75 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4C1555581F2E76C7C7D3F23F /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-BarScannerGIT-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		77EDC1DC2233C408CCCD1DE4 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-BarScannerGIT-BarScannerGITUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D100F7A517CDA765AD3F98EF /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-BarScannerGITTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		0C849F892D1BF39F009CF9F6 /* Sources */ = {
@@ -390,6 +499,7 @@
 		};
 		0C849FB22D1BF3A0009CF9F6 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 550183E8C4BBE72E793C3046 /* Pods-BarScannerGIT.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -405,6 +515,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -420,6 +531,7 @@
 		};
 		0C849FB32D1BF3A0009CF9F6 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5AA71EF57049E924DC1AE0A6 /* Pods-BarScannerGIT.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -435,6 +547,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -450,6 +563,7 @@
 		};
 		0C849FB52D1BF3A0009CF9F6 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BC1EAF7F249BE467CD63C81 /* Pods-BarScannerGITTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -469,6 +583,7 @@
 		};
 		0C849FB62D1BF3A0009CF9F6 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 037BB0BDBD272DC8BC6F5BFD /* Pods-BarScannerGITTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -488,6 +603,7 @@
 		};
 		0C849FB82D1BF3A0009CF9F6 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5B552557AC668990BDB9D141 /* Pods-BarScannerGIT-BarScannerGITUITests.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -505,6 +621,7 @@
 		};
 		0C849FB92D1BF3A0009CF9F6 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4893C660BA1CE636DF28D591 /* Pods-BarScannerGIT-BarScannerGITUITests.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;

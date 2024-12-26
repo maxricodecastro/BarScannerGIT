@@ -22,11 +22,7 @@ struct ContentView: View {
                             .background(Theme.background)
                     case 2:
                         CameraViewWithOverlay()
-                            .tabItem {
-                                Image(systemName: "camera.fill")
-                                Text("Scan")
-                            }
-                            .tag(2)
+                            .edgesIgnoringSafeArea(.all)
                     case 3:
                         Text("Notifications")
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -91,4 +87,5 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
+
 
