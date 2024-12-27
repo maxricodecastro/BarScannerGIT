@@ -1,84 +1,116 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var selectedTab = 0
-    @State private var isBottomSheetPresented = false
+    @State private var selectedTab: Int = 0
+    @StateObject private var cameraViewModel = CameraViewModel()
     
     var body: some View {
-        ZStack(alignment: .bottom) {
-            // Main content area
-            Theme.background
-                .ignoresSafeArea()
+        ZStack {
+            switch selectedTab {
+            case 0:
+                HomeView()
+            case 1:
+                Text("Search")
+            case 2:
+                CameraView(viewModel: cameraViewModel)
+            case 3:
+                Text("Notifications")
+            case 4:
+                Text("Profile")
+            default:
+                Text("Unknown Tab")
+            }
             
-            VStack(spacing: 0) {
-                // Content area
-                ZStack {
-                    switch selectedTab {
-                    case 0:
-                        HomeView(isBottomSheetPresented: $isBottomSheetPresented)
-                    case 1:
-                        Text("Search")
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(Theme.background)
-                    case 2:
-                        CameraViewWithOverlay()
-                            .edgesIgnoringSafeArea(.all)
-                    case 3:
-                        Text("Notifications")
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(Theme.background)
-                    case 4:
-                        Text("Profile")
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(Theme.background)
-                    default:
-                        EmptyView()
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                
-                // Custom Tab Bar
+            VStack {
+                Spacer()
                 CustomTabBar(selectedTab: $selectedTab)
             }
-            .background(Theme.background)
-            
-            // Bottom Sheet
-            if isBottomSheetPresented {
-                ZStack(alignment: .bottom) {
-                    Color.black.opacity(0.3)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            isBottomSheetPresented = false
-                        }
-                    
-                    CustomBottomSheet(isPresented: $isBottomSheetPresented)
-                }
-            }
         }
-        .background(Theme.background)
     }
 }
 
 struct HomeView: View {
-    @Binding var isBottomSheetPresented: Bool
-    
+    @State var showingBottomSheet = false
     var body: some View {
         VStack {
-            Text("Home Screen")
-                .font(.largeTitle)
-                .foregroundColor(Theme.text)
-                .padding()
-            
-            Button("Show Bottom Sheet") {
-                isBottomSheetPresented = true
+            Button("Tap me") {
+                showingBottomSheet.toggle()
             }
-            .padding()
-            .background(Theme.primary)
-            .foregroundColor(Theme.background)
-            .cornerRadius(10)
+            .buttonStyle(.borderedProminent)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Theme.background)
+        .sheet(isPresented:  $showingBottomSheet) {
+            BottomSheetView()
+                .presentationDetents([.fraction(0.3), .fraction(0.8)])
+        }
+    }
+}
+
+
+//content of the sheet
+struct BottomSheetView : View {
+    var body: some View {
+        VStack {
+            // Top content that stays fixed
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Product Title")
+                        .font(Theme.Typography.title)
+                        .foregroundColor(Theme.Typography.titleColor)
+                        
+                    Text("Subtitle Product")
+                        .font(Theme.Typography.subtitle)
+                    
+                    //review stars
+                    HStack(spacing: 4) {
+                        ForEach(0..<5) { _ in
+                            Image(systemName: "star.fill")
+                                .foregroundColor(.yellow)
+                                .frame(width: 24, height: 24)
+                        }
+                    }
+                    .padding(.top, 8)
+                    .padding(.leading, 0)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                
+                Button(action: {
+                    // Action here
+                }) {
+                    Text("$100")
+                        .font(Theme.Typography.largeText)
+                        .foregroundColor(Theme.Typography.largeTextColor)  // Text color
+                        .frame(width: 60, height: 30)  // Button size
+                        .background(Color.white)  // Background color
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(Theme.Typography.largeTextColor, lineWidth: 2)  // Stroke color and width
+                        )
+                        .cornerRadius(10)
+                }
+                .padding(.trailing, 16)  // Space from right edge
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.leading, 108)
+            .padding(.top, 24)
+            
+            Spacer()  // Pushes everything below down
+            
+            
+            
+            // Bottom content
+            HStack {
+                Image(systemName: "star")
+                    .padding()
+                
+                Image(systemName: "bell")
+                    .padding()
+                
+                Image(systemName: "globe")
+                    .padding()
+            }
+        }
     }
 }
 

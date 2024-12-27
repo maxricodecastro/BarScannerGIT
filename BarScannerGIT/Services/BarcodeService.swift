@@ -67,6 +67,8 @@ final class BarcodeService: BarcodeServiceProtocol {
                 print("   Category: \(response.properties.category?.first ?? "N/A")")
                 print("   Has Images: \(response.stores?.isEmpty == false ? "Yes" : "No")")
                 
+                saveResponseToFile(data, barcode: barcode)
+                
                 return BarcodeInfo(from: response)
             } catch {
                 print("❌ Decoding error: \(error)")
@@ -79,12 +81,33 @@ final class BarcodeService: BarcodeServiceProtocol {
             throw BarcodeError.networkError(error)
         }
     }
+    
+    private func saveResponseToFile(_ data: Data, barcode: String) {
+        do {
+            let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            let fileURL = documentsDirectory.appendingPathComponent("api_response_\(barcode).json")
+            try data.write(to: fileURL)
+            print("✅ API response saved to: \(fileURL.path)")
+        } catch {
+            print("❌ Failed to save API response: \(error.localizedDescription)")
+        }
+    }
 }
 
 struct BigProductResponse: Codable {
     let gtin: String
     let properties: Properties
     let stores: [Store]?
+    
+    func firstImageURL() -> String? {
+        guard let stores = stores else { return nil }
+        for s in stores {
+            if let img = s.image, !img.isEmpty {
+                return img
+            }
+        }
+        return nil
+    }
 }
 
 struct Properties: Codable {
@@ -96,8 +119,9 @@ struct Properties: Codable {
 }
 
 struct Store: Codable {
-    let store: String
+    let store: String?
     let price: StorePrice?
+    let image: String?
 }
 
 struct StorePrice: Codable {

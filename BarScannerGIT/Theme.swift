@@ -1,18 +1,43 @@
 import SwiftUI
 
 struct Theme {
-    static let primary = Color("007AFF")    // Main blue color
-    static let background = Color("FFFFFF")  // White
-    static let text = Color("000000")       // Black
-    static let secondaryText = Color("6E6E73") // Gray
-    static let warning = Color("FF9500")     // Orange
-    static let success = Color("34C759")     // Green
-    static let star = Color("FFD700")        // Gold for star ratings
-    static let border = Color("E5E5EA")      // Light gray for borders
+    // Original color schemes
+    static let background = Color.white
+    static let text = Color.black
+    static let secondaryText = Color.gray
+    static let primary = Color.blue
+    static let border = Color.gray.opacity(0.3)
+    static let success = Color.green
+    static let warning = Color.orange
+    static let star = Color.yellow
+    
+    // New Typography system
+    struct Typography {
+        // Title - 48px SF Pro Bold - Black
+        static let title = Font.system(size: 24, weight: .bold)
+        static let titleColor = Color.black
+        
+        // Smaller Title - 44px SF Pro Semibold - Black
+        static let smallerTitle = Font.system(size: 44, weight: .semibold)
+        static let smallerTitleColor = Color.black
+        
+        // Large Text - 40px SF Pro Regular - #717171
+        static let largeText = Font.system(size: 16, weight: .regular)
+        static let largeTextColor = Color(hex: "717171")
+        
+        // Large Text Bold - 40px SF Pro Bold - Black
+        static let largeTextBold = Font.system(size: 16, weight: .bold)
+        static let largeTextBoldColor = Color.black
+        
+        // Subtitle - 36px SF Pro Regular - #8F8F8F
+        static let subtitle = Font.system(size: 16, weight: .regular)
+        static let subtitleColor = Color(hex: "8F8F8F")
+    }
 }
 
-private extension Color {
-    init(_ hex: String) {
+// Helper extension to create Colors from hex values
+extension Color {
+    init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int: UInt64 = 0
         Scanner(string: hex).scanHexInt64(&int)
@@ -25,7 +50,7 @@ private extension Color {
         case 8: // ARGB (32-bit)
             (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
         default:
-            (a, r, g, b) = (1, 1, 1, 0)
+            (a, r, g, b) = (255, 0, 0, 0)
         }
         self.init(
             .sRGB,
