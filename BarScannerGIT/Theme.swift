@@ -10,28 +10,37 @@ struct Theme {
     static let success = Color.green
     static let warning = Color.orange
     static let star = Color.yellow
+    static let spacerline = Color(hex: "D9D9D9")
+    
     
     // New Typography system
     struct Typography {
-        // Title - 48px SF Pro Bold - Black
-        static let title = Font.system(size: 24, weight: .bold)
+        // Title - 18px (Product Title)
+        static let title = Font.system(size: 18, weight: .bold)
         static let titleColor = Color.black
         
-        // Smaller Title - 44px SF Pro Semibold - Black
-        static let smallerTitle = Font.system(size: 44, weight: .semibold)
+        // Subtitle - 14px SF Pro Semibold - Black
+        static let smallerTitle = Font.system(size: 14, weight: .semibold)
         static let smallerTitleColor = Color.black
         
-        // Large Text - 40px SF Pro Regular - #717171
-        static let largeText = Font.system(size: 16, weight: .regular)
-        static let largeTextColor = Color(hex: "717171")
+        // Body text - 14px SF Pro Regular - #8F8F8F
+        static let largeText = Font.system(size: 14, weight: .regular)
+        static let largeTextColor = Color(hex: "8F8F8F")
         
-        // Large Text Bold - 40px SF Pro Bold - Black
-        static let largeTextBold = Font.system(size: 16, weight: .bold)
-        static let largeTextBoldColor = Color.black
+        // Body text - 14px SF Pro Regular - #717171
+        static let subtitle = Font.system(size: 14, weight: .regular)
+        static let subtitleColor = Color(hex: "717171")
         
-        // Subtitle - 36px SF Pro Regular - #8F8F8F
-        static let subtitle = Font.system(size: 16, weight: .regular)
-        static let subtitleColor = Color(hex: "8F8F8F")
+        //Small Text - 12px SF Pro Regular - #BABABA
+        static let smallBody = Font.system(size: 12, weight : .regular)
+        static let smallBodyColor = Color(hex: "BABABA")
+    }
+    
+    struct Images {
+        static let google = "googlelogo"
+        static let bestbuy = "bestbuylogo"
+        static let amazon = "amazonlogo"
+        static let metaquest3 = "metaquest3"
     }
 }
 
