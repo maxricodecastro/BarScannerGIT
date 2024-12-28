@@ -101,17 +101,17 @@ struct BottomSheetData {
     // Example data
     static let example = BottomSheetData(
         barcode: "305212750003",
-        productTitle: "Vaseline Lip Therapy Advanced Healing",
+        productTitle: "Vaseline Lip Therapy",
         companyName: "Vaseline",
         reviewCount: 1230,
-        descriptionText: "Reviewers generally praise the Vaseline Lip Therapy Advanced Healing Ointment for its effective healing and moisturizing properties. However, some users find the ointment to be greasy and sticky, which can be a drawback for those who prefer a lighter texture.",
+        descriptionText: "Vaseline Lip Therapy provides effective healing and moisturizing for dry lips. While most users praise its long-lasting protection, some find the texture too thick and greasy for daily use.",
         starRating: 4.3,
         companyTitle: "Health & Beauty",
         companyGenre: "Personal Care",
         companyValue: 4.3,
         companyTrust: "Trusted",
         imageUrl: "https://pics.walgreens.com/prodimg/15848/450.jpg",
-        price: "$10.99",
+        price: "$4.99",
         _pros: [
             "Healing properties",
             "Moisturizing",

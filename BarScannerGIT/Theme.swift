@@ -19,7 +19,7 @@ struct Theme {
     // New Typography system
     struct Typography {
         // Title - 18px (Product Title)
-        static let title = Font.system(size: 22, weight: .bold)
+        static let title = Font.system(size: 20, weight: .bold)
         static let titleColor = Color.black
         
         // Subtitle - 14px SF Pro Semibold - Black
@@ -31,7 +31,7 @@ struct Theme {
         static let largeTextColor = Color(hex: "8F8F8F")
         
         // Body text - 14px SF Pro Regular - #717171
-        static let subtitle = Font.system(size: 16, weight: .regular)
+        static let subtitle = Font.system(size: 14, weight: .regular)
         static let subtitleColor = Color(hex: "717171")
         
         //Small Text - 12px SF Pro Regular - #BABABA
@@ -43,8 +43,16 @@ struct Theme {
         static let companyTextColor = Color.white
         
         //Review Text - 12px SF Pro Regular - Black
-        static let reviewText = Font.system(size: 13, weight: .regular)
-        static let reviewTextColor = Color(hex: "717171")
+        static let reviewText = Font.system(size: 12, weight: .regular)
+        static let reviewTextColor = Color.black
+        
+        //Recommended Text - 12px SF Pro Bold - White
+        static let recommendedText = Font.system(size: 14, weight: .bold)
+        static let recommendedTextColor = Color.white
+        
+        //Stars Text - 12px SF Pro Semibold - Black
+        static let starsText = Font.system(size: 14, weight: .bold)
+        static let starsTextColor = Color.white
     }
     
     struct Images {

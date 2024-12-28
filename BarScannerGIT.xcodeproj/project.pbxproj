@@ -32,7 +32,7 @@
 /* Begin PBXFileReference section */
 		037BB0BDBD272DC8BC6F5BFD /* Pods-BarScannerGITTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BarScannerGITTests.release.xcconfig"; path = "Target Support Files/Pods-BarScannerGITTests/Pods-BarScannerGITTests.release.xcconfig"; sourceTree = "<group>"; };
 		0560440DE2170FA5D90F3676 /* Pods_BarScannerGIT.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BarScannerGIT.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		0C849F8D2D1BF39F009CF9F6 /* BarScannerGIT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BarScannerGIT.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C849F8D2D1BF39F009CF9F6 /* Thumbsy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Thumbsy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C849F9D2D1BF3A0009CF9F6 /* BarScannerGITTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BarScannerGITTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C849FA72D1BF3A0009CF9F6 /* BarScannerGITUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BarScannerGITUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4893C660BA1CE636DF28D591 /* Pods-BarScannerGIT-BarScannerGITUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BarScannerGIT-BarScannerGITUITests.release.xcconfig"; path = "Target Support Files/Pods-BarScannerGIT-BarScannerGITUITests/Pods-BarScannerGIT-BarScannerGITUITests.release.xcconfig"; sourceTree = "<group>"; };
@@ -105,7 +105,7 @@
 		0C849F8E2D1BF39F009CF9F6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0C849F8D2D1BF39F009CF9F6 /* BarScannerGIT.app */,
+				0C849F8D2D1BF39F009CF9F6 /* Thumbsy.app */,
 				0C849F9D2D1BF3A0009CF9F6 /* BarScannerGITTests.xctest */,
 				0C849FA72D1BF3A0009CF9F6 /* BarScannerGITUITests.xctest */,
 			);
@@ -156,7 +156,7 @@
 			);
 			name = BarScannerGIT;
 			productName = BarScannerGIT;
-			productReference = 0C849F8D2D1BF39F009CF9F6 /* BarScannerGIT.app */;
+			productReference = 0C849F8D2D1BF39F009CF9F6 /* Thumbsy.app */;
 			productType = "com.apple.product-type.application";
 		};
 		0C849F9C2D1BF3A0009CF9F6 /* BarScannerGITTests */ = {
@@ -522,7 +522,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = max.BarScannerGIT;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Thumbsy;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -554,7 +554,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = max.BarScannerGIT;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Thumbsy;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

@@ -50,16 +50,9 @@ struct HomeView: View {
     var body: some View {
         VStack {
             Button(action: {
-                // Make API call when button is pressed
-                Task {
-                    do {
-                        let data = try await BottomSheetData.fetch(barcode: "887276185156")
-                        viewModel.updateData(data)
-                        showingBottomSheet = true
-                    } catch {
-                        print("Error fetching data: \(error)")
-                    }
-                }
+                // Use example data directly
+                viewModel.updateData(BottomSheetData.example)
+                showingBottomSheet = true
             }) {
                 HStack(spacing: 8) {
                     Text("Show Product Info")
@@ -99,7 +92,7 @@ struct BottomSheetView: View {
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 24) {
-                Color.clear.frame(height: 12)
+                Color.clear.frame(height: 8)
                 
                 ProductInfoSection()
                 DetailsStack()
@@ -125,7 +118,7 @@ struct ProductInfoSection: View {
 }
 struct ProductInfoSectionComponent: View {
     var body: some View {
-        HStack {
+        HStack(alignment: .top) {
             ProductImage()
             ProductDetails()
         }
@@ -147,14 +140,11 @@ struct ProductImage: View {
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .frame(width: 110, height: 126)
+                    .frame(width: 100, height: 150)
                     .background(Color.gray.opacity(0.2))
                     .clipped()
                     .cornerRadius(10)
                     .padding(.leading, -4)
-                    .onAppear {
-                        print("Successfully loaded image from:", imageUrl)
-                    }
             case .failure(let error):
                 Image(systemName: "photo")
                     .resizable()
@@ -164,18 +154,12 @@ struct ProductImage: View {
                     .clipped()
                     .cornerRadius(10)
                     .padding(.leading, -4)
-                    .onAppear {
-                        print("Failed to load image:", error.localizedDescription)
-                    }
             default:
                 ProgressView()
                     .frame(width: 110, height: 126)
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(10)
                     .padding(.leading, -4)
-                    .onAppear {
-                        print("Loading image from:", imageUrl)
-                    }
             }
         }
     }
@@ -184,7 +168,7 @@ struct ProductImage: View {
 // Product details component
 struct ProductDetails: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 12) {
             ProductTitleSection()
             RatingStars()
         }
@@ -198,16 +182,19 @@ struct ProductTitleSection: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            HStack {
+            HStack(alignment: .firstTextBaseline) {
                 Text(viewModel.data.productTitle)
                     .font(Theme.Typography.title)
                     .foregroundColor(Theme.Typography.titleColor)
+                    .lineLimit(3)
                 
                 Spacer()
+
                 
                 Text(viewModel.data.price)
                     .font(Theme.Typography.subtitle)
                     .foregroundStyle(Theme.Typography.titleColor)
+                    .frame(maxWidth: UIScreen.main.bounds.width * 0.1)
             }
             
             Text(viewModel.data.companyName)
@@ -224,37 +211,47 @@ struct RatingStars: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 4) { // Small spacing between star and text
-                Image(systemName: "star.fill")
-                    .foregroundColor(.yellow)
-                    .frame(width: 24, height: 14)
-                
-                Text(viewModel.data.starRatingFormatted)
-                    .font(Theme.Typography.smallerTitle)
-                    .foregroundColor(Theme.Typography.smallerTitleColor)
-            }
-            VStack(spacing: 4) {
-                Text("Recommended")
-                    .font(Theme.Typography.largeText)
-                    .foregroundColor(Theme.Typography.largeTextColor)
+            Button(action: {
+                // Action here if needed
+            }) {
+                HStack(spacing: 8) {
+                    
+                    HStack(spacing: 4) {
+                        Image(systemName: "star.fill")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .foregroundColor(Color(hex: "FFD250"))
+                            .frame(width: 15, height: 15)
+                        
+                        Text(viewModel.data.starRatingFormatted)
+                            .font(Theme.Typography.starsText)
+                            .foregroundColor(Theme.Typography.starsTextColor)
+                    }
+                   
+                    
+                    Text("Great buy")
+                        .font(Theme.Typography.recommendedText)
+                        .foregroundColor(Theme.Typography.recommendedTextColor)
                 }
-            
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(Theme.companyColorGreen)
+                .cornerRadius(24)
+                
+                
+            }
             HStack{
-                Color.clear
-                    .frame(width: 24, height: 24) // Adjust these values as needed
+                Text(viewModel.data.reviewCountFormatted + " reviews")
+                    .font(Theme.Typography.smallBody)
+                    .foregroundStyle(Theme.Typography.smallBodyColor)
                 
                 Spacer()
-                    .frame(width: UIScreen.main.bounds.width * 0.30) // 6% of screen width
-                
-                VStack(alignment: .trailing, spacing: 4) {
-                    ReviewSourceCircles()
                     
-                    Text(viewModel.data.reviewCountFormatted + " reviews")
-                        .font(Theme.Typography.smallBody)
-                        .foregroundStyle(Theme.Typography.smallBodyColor)
-                }
-                
+                ReviewSourceCircles()
+
             }
+            .padding(.trailing, UIScreen.main.bounds.width * 0.05)
+            
             
         }
         
@@ -585,7 +582,7 @@ struct Company: View {
     
     var body: some View {
         HStack {
-            // Left side content
+            // Left side content	
             HStack(spacing: 8) {
                 Circle()
                     .fill(Theme.companyColorGreen)
