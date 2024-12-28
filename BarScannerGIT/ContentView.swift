@@ -4,30 +4,27 @@ struct ContentView: View {
     @State private var selectedTab: Int = 0
     @State private var showingBottomSheet = false
     @StateObject private var cameraViewModel = CameraViewModel()
+    @StateObject private var bottomSheetViewModel = BottomSheetViewModel()
     
     var body: some View {
         ZStack {
-            // Main content
             switch selectedTab {
             case 0:
                 HomeView()
-                    .sheet(isPresented: $showingBottomSheet) {
-                        
-                        //calling the data from the BottomSheetData
-                        BottomSheetView()
-                            .presentationDetents([
-                                .fraction(0.3),
-                                .fraction(0.8)
-                            ])
-                            .presentationBackground(.white)
-                            .presentationCornerRadius(20)
-                            .presentationDragIndicator(.visible)
-                    }
-                    .zIndex(1) // Bottom sheet above main content
             case 1:
                 Text("Search")
             case 2:
-                Text("Camera view")
+                CameraViewWithOverlay()
+                    .environmentObject(bottomSheetViewModel)
+                    .sheet(isPresented: $showingBottomSheet) {
+                        BottomSheetView()
+                            .environmentObject(bottomSheetViewModel)
+                            .presentationDetents([
+                                .fraction(0.25),
+                                .fraction(0.8)
+                            ])
+                            .presentationBackground(.white)
+                    }
             case 3:
                 Text("Notifications")
             case 4:
@@ -36,13 +33,12 @@ struct ContentView: View {
                 Text("Unknown Tab")
             }
             
-            // Tab bar always on top
             VStack {
                 Spacer()
                 CustomTabBar(selectedTab: $selectedTab)
             }
             .ignoresSafeArea(.keyboard)
-            .zIndex(2) // Tab bar above everything
+            .zIndex(2)
         }
     }
 }
@@ -57,7 +53,7 @@ struct HomeView: View {
                 // Make API call when button is pressed
                 Task {
                     do {
-                        let data = try await BottomSheetData.fetch(barcode: 887276185156)
+                        let data = try await BottomSheetData.fetch(barcode: "887276185156")
                         viewModel.updateData(data)
                         showingBottomSheet = true
                     } catch {
@@ -209,7 +205,7 @@ struct ProductTitleSection: View {
                 
                 Spacer()
                 
-                Text("$299")
+                Text(viewModel.data.price)
                     .font(Theme.Typography.subtitle)
                     .foregroundStyle(Theme.Typography.titleColor)
             }

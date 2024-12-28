@@ -8,8 +8,10 @@ final class CameraViewModel: ObservableObject {
     @Published var showAlert = false
     @Published var errorMessage = ""
     @Published var isScanning = true
+    @Published var showBottomSheet = false
     
     private let barcodeService: BarcodeServiceProtocol
+    var bottomSheetViewModel: BottomSheetViewModel?
     
     init(barcodeService: BarcodeServiceProtocol = BarcodeService()) {
         self.barcodeService = barcodeService
@@ -19,29 +21,27 @@ final class CameraViewModel: ObservableObject {
     func handleScannedBarcode(_ barcode: String) {
         guard isScanning else { return }
         
-        print("Handling barcode: \(barcode)")
+        print("Original scanned barcode: \(barcode)")
         scannedBarcode = barcode
         isScanning = false
+        productName = "Loading..."
+        
+        // Remove only one leading zero for UPC-A format
+        let trimmedBarcode = barcode.hasPrefix("0") ? String(barcode.dropFirst()) : barcode
+        print("Trimmed barcode for API: \(trimmedBarcode)")
         
         Task { @MainActor in
             do {
-                print("Fetching product info for barcode: \(barcode)")
-                let info = try await barcodeService.fetchProductInfo(barcode: barcode)
-                
-                // Build product name from available information
-                let productInfo = [
-                    info.brand,
-                    info.title,
-                    info.description
-                ].compactMap { $0 }.joined(separator: " - ")
-                
-                self.productName = productInfo.isEmpty ? "Product details not found" : productInfo
-                print("Updated product name to: \(self.productName)")
+                let data = try await BottomSheetData.fetch(barcode: trimmedBarcode)
+                bottomSheetViewModel?.updateData(data)
+                showBottomSheet = true
+                productName = "Scan a product"
             } catch {
                 print("Error occurred: \(error)")
                 self.showAlert = true
                 self.errorMessage = "Error fetching product: \(error.localizedDescription)"
                 self.isScanning = true
+                productName = "Scan a product"
             }
         }
     }
@@ -145,31 +145,27 @@ extension CameraView {
 // MARK: - Camera View With Overlay
 struct CameraViewWithOverlay: View {
     @StateObject private var viewModel = CameraViewModel()
-    
-    private let scannerOverlay = ScannerOverlay()
+    @EnvironmentObject var bottomSheetViewModel: BottomSheetViewModel
     
     var body: some View {
         ZStack {
             CameraView(viewModel: viewModel)
                 .edgesIgnoringSafeArea(.all)
+                .onAppear {
+                    viewModel.bottomSheetViewModel = bottomSheetViewModel
+                }
             
             VStack {
-                ProductNameHeader(name: viewModel.productName)
                 Spacer()
-                scannerOverlay
+                ScannerOverlay()
+                Text(viewModel.productName)
+                    .font(.title2.bold())
+                    .foregroundColor(.white)
+                    .padding(.top, 4)
+                    .padding(.trailing, UIScreen.main.bounds.width * 0.2) // Aligns with rectangle's left edge
                 Spacer()
                 if !viewModel.scannedBarcode.isEmpty {
-                    VStack {
-                        BarcodeFooter(code: viewModel.scannedBarcode)
-                        Button("Scan Again") {
-                            viewModel.resetScanner()
-                        }
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                        .padding(.bottom, 20)
-                    }
+                    BarcodeFooter(code: viewModel.scannedBarcode)
                 }
             }
         }
@@ -179,6 +175,21 @@ struct CameraViewWithOverlay: View {
             }
         } message: {
             Text(viewModel.errorMessage)
+        }
+        .sheet(isPresented: .init(
+            get: { viewModel.showBottomSheet },
+            set: { viewModel.showBottomSheet = $0 }
+        )) {
+            BottomSheetView()
+                .environmentObject(bottomSheetViewModel)
+                .presentationDetents([
+                    .fraction(0.25),
+                    .fraction(0.8)
+                ])
+                .presentationBackground(.white)
+                .onDisappear {
+                    viewModel.resetScanner()
+                }
         }
     }
 }
@@ -202,7 +213,7 @@ private struct ProductNameHeader: View {
 
 private struct ScannerOverlay: View {
     var body: some View {
-        Rectangle()
+        RoundedRectangle(cornerRadius: 12)
             .stroke(Color.white, lineWidth: 6)
             .frame(
                 width: UIScreen.main.bounds.width * 0.6,

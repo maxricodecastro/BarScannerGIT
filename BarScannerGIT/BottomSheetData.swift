@@ -1,7 +1,7 @@
 import Foundation
 
 struct BottomSheetData {
-    let barcode: Int
+    let barcode: String
     let productTitle: String
     let companyName: String
     let reviewCount: Int
@@ -12,6 +12,7 @@ struct BottomSheetData {
     let companyValue: Double
     let companyTrust: String
     let imageUrl: String
+    let price: String
     private let _pros: [String]
     private let _cons: [String]
     
@@ -62,7 +63,7 @@ struct BottomSheetData {
     }
     
     // Static function to fetch and create BottomSheetData from API
-    static func fetch(barcode: Int) async throws -> BottomSheetData {
+    static func fetch(barcode: String) async throws -> BottomSheetData {
         let urlString = "https://qrbackend-ghtk.onrender.com/products/\(barcode)"
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
@@ -79,7 +80,7 @@ struct BottomSheetData {
         let companyGenre = categoryComponents.first ?? ""
         let companyTitle = response.product.brand
         
-        let bottomSheetData = BottomSheetData(
+        return BottomSheetData(
             barcode: barcode,
             productTitle: response.product.name,
             companyName: response.product.brand,
@@ -91,17 +92,15 @@ struct BottomSheetData {
             companyValue: response.review_summary.average_rating,
             companyTrust: "Trusted",
             imageUrl: response.product.image_url.replacingOccurrences(of: "http://", with: "https://"),
+            price: response.product.price,
             _pros: response.review_summary.pros,
             _cons: response.review_summary.cons
         )
-        
-        print("Image URL in BottomSheetData:", bottomSheetData.imageUrl)
-        return bottomSheetData
     }
     
     // Example data
     static let example = BottomSheetData(
-        barcode: 305212750003,
+        barcode: "305212750003",
         productTitle: "Vaseline Lip Therapy Advanced Healing",
         companyName: "Vaseline",
         reviewCount: 1230,
@@ -112,6 +111,7 @@ struct BottomSheetData {
         companyValue: 4.3,
         companyTrust: "Trusted",
         imageUrl: "https://pics.walgreens.com/prodimg/15848/450.jpg",
+        price: "$10.99",
         _pros: [
             "Healing properties",
             "Moisturizing",
