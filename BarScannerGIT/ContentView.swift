@@ -67,190 +67,229 @@ struct HomeView: View {
 struct BottomSheetView: View {
     var body: some View {
         VStack(spacing: 24) {
-            Color.clear.frame(height: 0) // Fixed 8px spacing at top
-            VStack {
+            Color.clear.frame(height: 8)
+            ProductInfoSection()
             
-                //product images
-                HStack(alignment: .top, spacing: 12) {
-                    Image(Theme.Images.metaquest3)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 110, height: 126)
-                        .background(Color.gray.opacity(0.2))
-                        .clipped()
-                        .cornerRadius(10)
-                        .padding(.leading, -4)
-                    
-                    //entire vstack
-                    VStack(alignment: .leading, spacing: 4) {
-                        // Product Title VStack
-                        VStack(alignment: .leading, spacing: 4) { // Control spacing between title and subtitle
-                            Text("Meta Quest 3")
-                                .font(Theme.Typography.title)
-                                .foregroundColor(Theme.Typography.titleColor)
-                                .padding(.leading, 0)
-                            
-                            Text("Meta")
-                                .font(Theme.Typography.largeText)
-                                .foregroundColor(Theme.Typography.largeTextColor)
-                                .padding(.leading, 0)
-                        }
-                        .padding(.top, 8) // Control space from top of parent VStack
-                        
-                        //review stars
-                        HStack(spacing: 0) {
-                            ForEach(0..<5) { _ in
-                                Image(systemName: "star.fill")
-                                    .foregroundColor(.yellow)
-                                    .frame(width: 24, height: 24)
-                            }
-                        }
-                        
-                        //hstack containing the quality + review sources
-                        HStack(alignment: .top, spacing: 28) {
-                            //Quality text with stars description
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Great Quality")
-                                    .font(Theme.Typography.largeText)
-                                    .foregroundColor(Theme.Typography.largeTextColor)
-                                    .padding(.leading, 0)
-                                
-                                Text("4.5/5 stars")
-                                    .font(Theme.Typography.smallBody)
-                                    .foregroundColor(Theme.Typography.smallBodyColor)
-                                    .padding(.leading, 0)
-                            }
-                            
-                            ZStack { // Main ZStack for layering
-                                // Bottom layer: Circles in HStack
-                                HStack(spacing: -6) { // Control overlap between circles
-                                    
-                                    // google circle (top)
-                                    Circle()
-                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                        .frame(width: 24, height: 24)
-                                        .background(Circle().fill(Color.black))
-                                        .overlay(
-                                            Image(Theme.Images.google)
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fit)
-                                                .frame(width: 24, height: 24)
-                                                .foregroundColor(.white)
-                                        )
-                                        .zIndex(2)
-                                    
-                                    // bestbuy circle (underneath google)
-                                    Circle()
-                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                        .frame(width: 24, height: 24)
-                                        .background(Circle().fill(Color.black))
-                                        .overlay(
-                                            Image(Theme.Images.bestbuy)
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fit)
-                                                .frame(width: 24, height: 24)
-                                                .foregroundColor(.white)
-                                        )
-                                        .zIndex(1)
-                                    
-                                    // +3 circle for more sources
-                                    Circle()
-                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                        .frame(width: 24, height: 24)
-                                        .background(Circle().fill(Color.white))
-                                        .overlay(
-                                            Circle()
-                                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                                .frame(width: 24, height: 24)
-                                                .background(Circle().fill(Color.white))
-                                                .overlay(
-                                                    Text("+3")
-                                                        .font(Theme.Typography.smallBody)
-                                                        .foregroundColor(Theme.Typography.smallBodyColor)
-                                                )
-                                                .zIndex(0)
-                                        )
-                                }
-                                .offset(x: 64) // Control position of circle group
-                                .zIndex(1) // Circles group is at bottom
-                                
-                                // Top layer: Button
-                                Button(action: {
-                                    //add our action here
-                                }) {
-                                    HStack(spacing: 8) {
-                                        Circle()
-                                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                            .frame(width: 24, height: 24)
-                                            .background(Circle().fill(Color.black))
-                                            .overlay(
-                                                Image(Theme.Images.amazon)
-                                                    .resizable()
-                                                    .aspectRatio(contentMode: .fit)
-                                                    .frame(width: 24, height: 24)
-                                                    .foregroundColor(.white))
-                                                .padding(.leading, 0)
-                                            
-                                        Text("Amazon")
-                                            .font(Theme.Typography.smallBody)
-                                            .foregroundColor(Theme.Typography.smallBodyColor)
-                                            .padding(.trailing, 12)
-                                    }
-                                    .foregroundColor(.black)
-                                    .padding(.vertical, 0)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 20)
-                                            .fill(Color.white)
-                                    )
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 20)
-                                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                    )
-                                    .fixedSize(horizontal: true, vertical: false)
-                                }
-                                .zIndex(2) // Button is on top
-                            }
-                        }
-                        
-                        .padding(.top, 0)
-                        
-                        .padding(.top, 4)
-                        .padding(.leading, 0)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    
-                    .padding(.leading, 0)
-                    .padding(.top, 0)
-                    
-                    Spacer()
-                }
-            }
-        }
-            
-            
-            
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.leading, 24)
-            
-            //spacer line
             Rectangle()
                 .frame(width: UIScreen.main.bounds.width * 0.8, height: 1)
                 .foregroundColor(Theme.spacerline)
             
             Spacer()
-            
-            // Bottom content
-            HStack {
-                Image(systemName: "star")
-                    .padding()
-                Image(systemName: "bell")
-                    .padding()
-                Image(systemName: "globe")
-                    .padding()
-            }
-        
+            BottomIconsSection()
+        }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Color.white)
+    }
+}
+
+// Main product info section
+struct ProductInfoSection: View {
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            ProductImage()
+            ProductDetails()
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.leading, 24)
+    }
+}
+
+// Product image component
+struct ProductImage: View {
+    var body: some View {
+        Image(Theme.Images.metaquest3)
+            .resizable()
+            .aspectRatio(contentMode: .fill)
+            .frame(width: 110, height: 126)
+            .background(Color.gray.opacity(0.2))
+            .clipped()
+            .cornerRadius(10)
+            .padding(.leading, -4)
+    }
+}
+
+// Product details component
+struct ProductDetails: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            ProductTitleSection()
+            RatingStars()
+            ReviewSection()
+        }
+        .padding(.top, 0)
+    }
+}
+
+// Product title section
+struct ProductTitleSection: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Meta Quest 3")
+                .font(Theme.Typography.title)
+                .foregroundColor(Theme.Typography.titleColor)
+            
+            Text("Meta")
+                .font(Theme.Typography.largeText)
+                .foregroundColor(Theme.Typography.largeTextColor)
+        }
+        .padding(.top, 8)
+    }
+}
+
+// Rating stars component
+struct RatingStars: View {
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(0..<5) { _ in
+                Image(systemName: "star.fill")
+                    .foregroundColor(.yellow)
+                    .frame(width: 24, height: 24)
+            }
+        }
+    }
+}
+
+// Review section component
+struct ReviewSection: View {
+    var body: some View {
+        HStack(alignment: .top, spacing: 28) {
+            QualityRating()
+            ReviewSourcesSection()
+        }
+        .padding(.top, 4)
+    }
+}
+
+// Quality rating component
+struct QualityRating: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Great Quality")
+                .font(Theme.Typography.largeText)
+                .foregroundColor(Theme.Typography.largeTextColor)
+            
+            Text("4.5/5 stars")
+                .font(Theme.Typography.smallBody)
+                .foregroundColor(Theme.Typography.smallBodyColor)
+        }
+    }
+}
+
+// Review sources section
+struct ReviewSourcesSection: View {
+    var body: some View {
+        ZStack {
+            ReviewSourceCircles()
+                .offset(x: 64)
+                .zIndex(1)
+            
+            AmazonButton()
+                .zIndex(2)
+        }
+    }
+}
+
+// Review source circles
+struct ReviewSourceCircles: View {
+    var body: some View {
+        HStack(spacing: -6) {
+            SourceCircle(image: Theme.Images.google)
+                .zIndex(2)
+            
+            SourceCircle(image: Theme.Images.bestbuy)
+                .zIndex(1)
+            
+            PlusThreeCircle()
+                .zIndex(0)
+        }
+    }
+}
+
+// Source circle component
+struct SourceCircle: View {
+    let image: String
+    
+    var body: some View {
+        Circle()
+            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+            .frame(width: 24, height: 24)
+            .background(Circle().fill(Color.black))
+            .overlay(
+                Image(image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 24, height: 24)
+                    .foregroundColor(.white)
+            )
+    }
+}
+
+// Plus three circle component
+struct PlusThreeCircle: View {
+    var body: some View {
+        Circle()
+            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+            .frame(width: 24, height: 24)
+            .background(Circle().fill(Color.white))
+            .overlay(
+                Text("+3")
+                    .font(Theme.Typography.smallBody)
+                    .foregroundColor(Theme.Typography.smallBodyColor)
+            )
+    }
+}
+
+// Amazon button component
+struct AmazonButton: View {
+    var body: some View {
+        Button(action: {
+            //add our action here
+        }) {
+            HStack(spacing: 8) {
+                Circle()
+                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                    .frame(width: 24, height: 24)
+                    .background(Circle().fill(Color.black))
+                    .overlay(
+                        Image(systemName: "checkmark")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 14, height: 14)
+                            .foregroundColor(.white)
+                    )
+                
+                Text("Amazon")
+                    .font(Theme.Typography.smallBody)
+                    .foregroundColor(Theme.Typography.smallBodyColor)
+                    .padding(.trailing, 12)
+            }
+            .foregroundColor(.black)
+            .padding(.vertical, 0)
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color.white)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+            )
+            .fixedSize(horizontal: true, vertical: false)
+        }
+    }
+}
+
+// Bottom icons section
+struct BottomIconsSection: View {
+    var body: some View {
+        HStack {
+            Image(systemName: "star")
+                .padding()
+            Image(systemName: "bell")
+                .padding()
+            Image(systemName: "globe")
+                .padding()
+        }
     }
 }
 
