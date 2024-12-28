@@ -41,6 +41,10 @@ struct Theme {
         //Company Text - 12px SF Pro Regular - White
         static let companyText = Font.system(size: 14, weight: .regular)
         static let companyTextColor = Color.white
+        
+        //Review Text - 12px SF Pro Regular - Black
+        static let reviewText = Font.system(size: 13, weight: .regular)
+        static let reviewTextColor = Color(hex: "717171")
     }
     
     struct Images {

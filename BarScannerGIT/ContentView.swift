@@ -12,6 +12,8 @@ struct ContentView: View {
             case 0:
                 HomeView()
                     .sheet(isPresented: $showingBottomSheet) {
+                        
+                        //calling the data from the BottomSheetData
                         BottomSheetView()
                             .presentationDetents([
                                 .fraction(0.3),
@@ -47,13 +49,24 @@ struct ContentView: View {
 
 struct HomeView: View {
     @State var showingBottomSheet = false
+    @StateObject private var viewModel = BottomSheetViewModel()
+    
     var body: some View {
         VStack {
             Button(action: {
-                showingBottomSheet = true
+                // Make API call when button is pressed
+                Task {
+                    do {
+                        let data = try await BottomSheetData.fetch(barcode: 887276185156)
+                        viewModel.updateData(data)
+                        showingBottomSheet = true
+                    } catch {
+                        print("Error fetching data: \(error)")
+                    }
+                }
             }) {
                 HStack(spacing: 8) {
-                    Text("Button Text")
+                    Text("Show Product Info")
                         .font(.system(size: 14))
                         .foregroundColor(.black)
                 }
@@ -72,9 +85,10 @@ struct HomeView: View {
         .background(Theme.background)
         .sheet(isPresented: $showingBottomSheet) {
             BottomSheetView()
+                .environmentObject(viewModel)
                 .presentationDetents([
-                    .fraction(0.25),  // Compact mode - only ProductInfoSection
-                    .fraction(0.8)   // Expanded mode - full content
+                    .fraction(0.25),
+                    .fraction(0.8)
                 ])
                 .presentationBackground(.white)
         }
@@ -84,23 +98,19 @@ struct HomeView: View {
 
 //content of the sheet
 struct BottomSheetView: View {
+    @EnvironmentObject var viewModel: BottomSheetViewModel
+    
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 24) {
                 Color.clear.frame(height: 12)
                 
                 ProductInfoSection()
-            
                 DetailsStack()
-                                
                 Description()
-                                
                 Company()
-                
-                
             }
         }
-        
     }
 }
 
@@ -130,15 +140,48 @@ struct ProductInfoSectionComponent: View {
 
 // Product image component
 struct ProductImage: View {
+    @EnvironmentObject var viewModel: BottomSheetViewModel
+    
     var body: some View {
-        Image(Theme.Images.metaquest3)
-            .resizable()
-            .aspectRatio(contentMode: .fill)
-            .frame(width: 110, height: 126)
-            .background(Color.gray.opacity(0.2))
-            .clipped()
-            .cornerRadius(10)
-            .padding(.leading, -4)
+        let imageUrl = viewModel.data.imageUrl
+        
+        AsyncImage(url: URL(string: imageUrl)) { phase in
+            switch phase {
+            case .success(let image):
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 110, height: 126)
+                    .background(Color.gray.opacity(0.2))
+                    .clipped()
+                    .cornerRadius(10)
+                    .padding(.leading, -4)
+                    .onAppear {
+                        print("Successfully loaded image from:", imageUrl)
+                    }
+            case .failure(let error):
+                Image(systemName: "photo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 110, height: 126)
+                    .background(Color.gray.opacity(0.2))
+                    .clipped()
+                    .cornerRadius(10)
+                    .padding(.leading, -4)
+                    .onAppear {
+                        print("Failed to load image:", error.localizedDescription)
+                    }
+            default:
+                ProgressView()
+                    .frame(width: 110, height: 126)
+                    .background(Color.gray.opacity(0.2))
+                    .cornerRadius(10)
+                    .padding(.leading, -4)
+                    .onAppear {
+                        print("Loading image from:", imageUrl)
+                    }
+            }
+        }
     }
 }
 
@@ -155,11 +198,12 @@ struct ProductDetails: View {
 
 // Product title section
 struct ProductTitleSection: View {
+    @EnvironmentObject var viewModel: BottomSheetViewModel
+    
     var body: some View {
-        
         VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Text("Meta Quest 3")
+                Text(viewModel.data.productTitle)
                     .font(Theme.Typography.title)
                     .foregroundColor(Theme.Typography.titleColor)
                 
@@ -168,12 +212,9 @@ struct ProductTitleSection: View {
                 Text("$299")
                     .font(Theme.Typography.subtitle)
                     .foregroundStyle(Theme.Typography.titleColor)
-                    
-
-
             }
             
-            Text("Meta")
+            Text(viewModel.data.companyName)
                 .font(Theme.Typography.largeText)
                 .foregroundColor(Theme.Typography.largeTextColor)
         }
@@ -183,6 +224,8 @@ struct ProductTitleSection: View {
 
 // Rating stars component
 struct RatingStars: View {
+    @EnvironmentObject var viewModel: BottomSheetViewModel
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 4) { // Small spacing between star and text
@@ -190,7 +233,7 @@ struct RatingStars: View {
                     .foregroundColor(.yellow)
                     .frame(width: 24, height: 14)
                 
-                Text("4.5")
+                Text(viewModel.data.starRatingFormatted)
                     .font(Theme.Typography.smallerTitle)
                     .foregroundColor(Theme.Typography.smallerTitleColor)
             }
@@ -210,7 +253,7 @@ struct RatingStars: View {
                 VStack(alignment: .trailing, spacing: 4) {
                     ReviewSourceCircles()
                     
-                    Text("12,302 reviews")
+                    Text(viewModel.data.reviewCountFormatted + " reviews")
                         .font(Theme.Typography.smallBody)
                         .foregroundStyle(Theme.Typography.smallBodyColor)
                 }
@@ -224,6 +267,8 @@ struct RatingStars: View {
 
 // Review section component
 struct ReviewSection: View {
+    @EnvironmentObject var viewModel: BottomSheetViewModel
+    
     var body: some View {
         HStack {
             Text("Recommended")
@@ -233,7 +278,7 @@ struct ReviewSection: View {
             VStack(alignment: .trailing, spacing: 4) {
                 ReviewSourceCircles()
                 
-                Text("12,302 reviews")
+                Text(viewModel.data.reviewCountFormatted)
                     .font(Theme.Typography.smallBody)
                     .foregroundStyle(Theme.Typography.smallBodyColor)
             }
@@ -338,13 +383,12 @@ struct AmazonButton: View {
 
 struct DetailsStack: View {
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: 8) {
             BuyersHaveToSay()
-            VStack(spacing: 8) {
-                ReviewIconsHStack()
-                ReviewIconsHStack()
+            VStack(alignment: .leading, spacing: 8) {
+                ReviewProsHStack()
+                ReviewConsHStack()
             }
-            
         }
     }
 }
@@ -354,18 +398,18 @@ struct DetailsStack: View {
 //Buyers have to say text
 struct BuyersHaveToSay: View {
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("Buyers have to say")
-                .font(Theme.Typography.smallerTitle)
-                .foregroundColor(Theme.Typography.smallerTitleColor)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.leading, UIScreen.main.bounds.width * 0.06)
+        Text("Buyers have to say")
+            .font(Theme.Typography.smallerTitle)
+            .foregroundColor(Theme.Typography.smallerTitleColor)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.leading, UIScreen.main.bounds.width * 0.06)
     }
 }
 
-//Review Icons Template
-struct ReviewIconsTemplate: View {
+
+struct ReviewProsTemplate: View {
+    let text: String
+    
     var body: some View {
         Button(action: {
             //add our action here
@@ -376,15 +420,15 @@ struct ReviewIconsTemplate: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 12, height: 12)
                     .foregroundColor(.black)
-                    .padding(.leading, UIScreen.main.bounds.width * 0.02) // 2% of screen width
+                    .padding(.leading, UIScreen.main.bounds.width * 0.02)
                     .padding(.trailing, 0)
                     .padding(.vertical, 8)
                 
-                Text("Detail #1")
-                    .font(Theme.Typography.largeText)
-                    .foregroundColor(Theme.Typography.largeTextColor)
+                Text(text)
+                    .font(Theme.Typography.reviewText)
+                    .foregroundColor(Theme.Typography.reviewTextColor)
                     .padding(.vertical, 8)
-                    .padding(.horizontal, UIScreen.main.bounds.width * 0.04) // 4% of screen width
+                    .padding(.horizontal, UIScreen.main.bounds.width * 0.04)
             }
         }
         .background(
@@ -396,31 +440,141 @@ struct ReviewIconsTemplate: View {
                 .stroke(Color.gray.opacity(0.3), lineWidth: 1)
         )
         .fixedSize(horizontal: true, vertical: false)
-        .frame(minWidth: UIScreen.main.bounds.width * 0.25) // 25% of screen width minimum
+        .frame(minWidth: UIScreen.main.bounds.width * 0.25)
         .frame(height: 36)
     }
 }
 
-struct ReviewIconsHStack: View {
+struct ReviewConsTemplate: View {
+    let text: String
+    
     var body: some View {
-        HStack(spacing: 8) {
-            ReviewIconsTemplate()
-            ReviewIconsTemplate()
-            ReviewIconsTemplate()
+        Button(action: {
+            //add our action here
+        }) {
+            HStack(spacing: 0) {
+                Image(systemName: "xmark")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 12, height: 12)
+                    .foregroundColor(.black)
+                    .padding(.leading, UIScreen.main.bounds.width * 0.02)
+                    .padding(.trailing, 0)
+                    .padding(.vertical, 8)
+                
+                Text(text)
+                    .font(Theme.Typography.reviewText)
+                    .foregroundColor(Theme.Typography.reviewTextColor)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, UIScreen.main.bounds.width * 0.04)
+            }
         }
-        .padding(.leading, UIScreen.main.bounds.width * 0.06)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.white)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+        )
+        .fixedSize(horizontal: true, vertical: false)
+        .frame(minWidth: UIScreen.main.bounds.width * 0.25)
+        .frame(height: 36)
+    }
+}
+
+struct ReviewProsHStack: View {
+    @EnvironmentObject var viewModel: BottomSheetViewModel
+    
+    var body: some View {
+        FlowLayout(spacing: 8) {
+            ForEach(viewModel.data.pros.indices, id: \.self) { index in
+                ReviewProsTemplate(text: viewModel.data.pros[index])
+            }
+        }
+        .padding(.horizontal, UIScreen.main.bounds.width * 0.06)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
+struct ReviewConsHStack: View {
+    @EnvironmentObject var viewModel: BottomSheetViewModel
+    
+    var body: some View {
+        FlowLayout(spacing: 8) {
+            ForEach(viewModel.data.cons.indices, id: \.self) { index in
+                ReviewConsTemplate(text: viewModel.data.cons[index])
+            }
+        }
+        .padding(.horizontal, UIScreen.main.bounds.width * 0.06)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+// Custom FlowLayout that wraps items
+struct FlowLayout: Layout {
+    var spacing: CGFloat = 8
+    
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let maxWidth = proposal.width ?? .infinity
+        var height: CGFloat = 0
+        var currentRow: CGFloat = 0
+        var currentX: CGFloat = 0
+        
+        for view in subviews {
+            let size = view.sizeThatFits(.unspecified)
+            
+            if currentX + size.width > maxWidth {
+                // Move to next row
+                height += currentRow + spacing
+                currentRow = size.height
+                currentX = size.width + spacing
+            } else {
+                currentX += size.width + spacing
+                currentRow = max(currentRow, size.height)
+            }
+        }
+        
+        height += currentRow
+        return CGSize(width: maxWidth, height: height)
+    }
+    
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        var currentX = bounds.minX
+        var currentY = bounds.minY
+        var rowHeight: CGFloat = 0
+        
+        for view in subviews {
+            let size = view.sizeThatFits(.unspecified)
+            
+            if currentX + size.width > bounds.maxX {
+                // Move to next row
+                currentX = bounds.minX
+                currentY += rowHeight + spacing
+                rowHeight = 0
+            }
+            
+            view.place(
+                at: CGPoint(x: currentX, y: currentY),
+                proposal: ProposedViewSize(size)
+            )
+            
+            currentX += size.width + spacing
+            rowHeight = max(rowHeight, size.height)
+        }
+    }
+}
+
 struct Description: View {
+    @EnvironmentObject var viewModel: BottomSheetViewModel
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Things to consider")
                 .font(Theme.Typography.smallerTitle)
                 .foregroundColor(Theme.Typography.smallerTitleColor)
             
-            Text("Battery life is limited (2-3 hours). Fit may vary; try before buying. Ideal for standalone VR but lacks PC-level graphics. Check app library, comfort, and storage capacity.")
+            Text(viewModel.data.descriptionText)
                 .font(Theme.Typography.largeText)
                 .foregroundStyle(Theme.Typography.largeTextColor)
                 .frame(width: UIScreen.main.bounds.width * 0.88, alignment: .leading) // Control text width
@@ -431,6 +585,8 @@ struct Description: View {
 }
 
 struct Company: View {
+    @EnvironmentObject var viewModel: BottomSheetViewModel
+    
     var body: some View {
         HStack {
             // Left side content
@@ -439,17 +595,17 @@ struct Company: View {
                     .fill(Theme.companyColorGreen)
                     .frame(width: 42, height: 42)
                     .overlay(
-                        Text("7.2")
+                        Text(viewModel.data.companyValueFormatted)
                             .font(Theme.Typography.companyText)
                             .foregroundStyle(Theme.Typography.companyTextColor)
                     )
                 
                 VStack(spacing: 4) {
-                    Text("Company Title")
+                    Text(viewModel.data.companyTitle)
                         .font(Theme.Typography.smallerTitle)
                         .foregroundStyle(Theme.Typography.smallerTitleColor)
                     
-                    Text("Company Genre")
+                    Text(viewModel.data.companyGenre)
                         .font(Theme.Typography.smallBody)
                         .foregroundStyle(Theme.Typography.smallBodyColor)
                 }
@@ -459,7 +615,7 @@ struct Company: View {
             Spacer() // Push content to sides
             
             // Right side content
-            Text("Trusted")
+            Text(viewModel.data.companyTrust)
                 .font(Theme.Typography.companyText)
                 .foregroundStyle(Theme.Typography.largeTextColor)
                 .padding(.trailing, UIScreen.main.bounds.width * 0.06) // Right padding
