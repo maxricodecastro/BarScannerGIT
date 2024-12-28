@@ -12,7 +12,8 @@ struct ContentView: View {
             case 1:
                 Text("Search")
             case 2:
-                CameraView(viewModel: cameraViewModel)
+                Text("Camera view")
+    
             case 3:
                 Text("Notifications")
             case 4:
@@ -56,7 +57,10 @@ struct HomeView: View {
         .background(Theme.background)
         .sheet(isPresented: $showingBottomSheet) {
             BottomSheetView()
-                .presentationDetents([.fraction(0.3), .fraction(0.8)])
+                .presentationDetents([
+                    .fraction(0.25),  // Compact mode - only ProductInfoSection
+                    .fraction(0.8)   // Expanded mode - full content
+                ])
                 .presentationBackground(.white)
         }
     }
@@ -66,29 +70,39 @@ struct HomeView: View {
 //content of the sheet
 struct BottomSheetView: View {
     var body: some View {
-        VStack(spacing: 24) {
-            Color.clear.frame(height: 8)
-            ProductInfoSection()
+        ScrollView(.vertical, showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 24) {
+                Color.clear.frame(height: 8)
+                
+                VStack(spacing: 16){
+                    ProductInfoSection()
+                    
+                    Rectangle()
+                        .frame(width: UIScreen.main.bounds.width * 0.8, height: 1)
+                        .foregroundColor(Theme.spacerline)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                }
             
-            Rectangle()
-                .frame(width: UIScreen.main.bounds.width * 0.8, height: 1)
-                .foregroundColor(Theme.spacerline)
-            
-            Spacer()
-            BottomIconsSection()
+                
+                DetailsStack()
+                                
+                Description()
+                                
+                Company()
+                
+                
+            }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background(Color.white)
+        
     }
 }
 
 // Main product info section
 struct ProductInfoSection: View {
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack {
             ProductImage()
             ProductDetails()
-            Spacer()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.leading, 24)
@@ -115,7 +129,6 @@ struct ProductDetails: View {
         VStack(alignment: .leading, spacing: 4) {
             ProductTitleSection()
             RatingStars()
-            ReviewSection()
         }
         .padding(.top, 0)
     }
@@ -124,10 +137,21 @@ struct ProductDetails: View {
 // Product title section
 struct ProductTitleSection: View {
     var body: some View {
+        
         VStack(alignment: .leading, spacing: 4) {
-            Text("Meta Quest 3")
-                .font(Theme.Typography.title)
-                .foregroundColor(Theme.Typography.titleColor)
+            HStack {
+                Text("Meta Quest 3")
+                    .font(Theme.Typography.title)
+                    .foregroundColor(Theme.Typography.titleColor)
+                
+                Spacer()
+                Spacer()
+                
+                Text("$299")
+                    .font(Theme.Typography.subtitle)
+                    .foregroundStyle(Theme.Typography.subtitleColor)
+                    .padding(.trailing, UIScreen.main.bounds.width * 0.1)
+            }
             
             Text("Meta")
                 .font(Theme.Typography.largeText)
@@ -140,52 +164,76 @@ struct ProductTitleSection: View {
 // Rating stars component
 struct RatingStars: View {
     var body: some View {
-        HStack(spacing: 0) {
-            ForEach(0..<5) { _ in
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 4) { // Small spacing between star and text
                 Image(systemName: "star.fill")
                     .foregroundColor(.yellow)
-                    .frame(width: 24, height: 24)
+                    .frame(width: 24, height: 14)
+                
+                Text("4.5")
+                    .font(Theme.Typography.smallerTitle)
+                    .foregroundColor(Theme.Typography.smallerTitleColor)
             }
+            VStack(spacing: 4) {
+                Text("Recommended")
+                    .font(Theme.Typography.largeText)
+                    .foregroundColor(Theme.Typography.largeTextColor)
+                }
+            
+            HStack{
+                Color.clear
+                    .frame(width: 24, height: 24) // Adjust these values as needed
+                
+                Spacer()
+                    .frame(width: UIScreen.main.bounds.width * 0.30) // 6% of screen width
+                
+                VStack(alignment: .trailing, spacing: 4) {
+                    ReviewSourceCircles()
+                    
+                    Text("12,302 reviews")
+                        .font(Theme.Typography.smallBody)
+                        .foregroundStyle(Theme.Typography.smallBodyColor)
+                }
+                
+            }
+            
         }
+        
     }
 }
 
 // Review section component
 struct ReviewSection: View {
     var body: some View {
-        HStack(alignment: .top, spacing: 28) {
-            QualityRating()
-            ReviewSourcesSection()
+        HStack {
+            Text("Recommended")
+                .font(Theme.Typography.largeText)
+                .foregroundColor(Theme.Typography.largeTextColor)
+            
+            VStack(alignment: .trailing, spacing: 4) {
+                ReviewSourceCircles()
+                
+                Text("12,302 reviews")
+                    .font(Theme.Typography.smallBody)
+                    .foregroundStyle(Theme.Typography.smallBodyColor)
+            }
         }
         .padding(.top, 4)
     }
 }
 
-// Quality rating component
-struct QualityRating: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Great Quality")
-                .font(Theme.Typography.largeText)
-                .foregroundColor(Theme.Typography.largeTextColor)
-            
-            Text("4.5/5 stars")
-                .font(Theme.Typography.smallBody)
-                .foregroundColor(Theme.Typography.smallBodyColor)
-        }
-    }
-}
 
 // Review sources section
 struct ReviewSourcesSection: View {
     var body: some View {
-        ZStack {
-            ReviewSourceCircles()
-                .offset(x: 64)
-                .zIndex(1)
-            
-            AmazonButton()
-                .zIndex(2)
+        HStack {
+            VStack(alignment: .trailing, spacing: 4) {
+                ReviewSourceCircles()
+                
+                Text("12,302 reviews")
+                    .font(Theme.Typography.smallBody)
+                    .foregroundStyle(Theme.Typography.smallBodyColor)
+            }
         }
     }
 }
@@ -193,7 +241,11 @@ struct ReviewSourcesSection: View {
 // Review source circles
 struct ReviewSourceCircles: View {
     var body: some View {
-        HStack(spacing: -6) {
+        HStack(spacing: -8) {
+            
+            SourceCircle(image: Theme.Images.amazon)
+                .zIndex(3)
+            
             SourceCircle(image: Theme.Images.google)
                 .zIndex(2)
             
@@ -279,17 +331,136 @@ struct AmazonButton: View {
     }
 }
 
-// Bottom icons section
-struct BottomIconsSection: View {
+
+struct DetailsStack: View {
+    var body: some View {
+        VStack(spacing: 8) {
+            BuyersHaveToSay()
+            VStack(spacing: 8) {
+                ReviewIconsHStack()
+                ReviewIconsHStack()
+            }
+            
+        }
+    }
+}
+
+
+
+//Buyers have to say text
+struct BuyersHaveToSay: View {
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Buyers have to say")
+                .font(Theme.Typography.smallerTitle)
+                .foregroundColor(Theme.Typography.smallerTitleColor)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.leading, UIScreen.main.bounds.width * 0.06)
+    }
+}
+
+//Review Icons Template
+struct ReviewIconsTemplate: View {
+    var body: some View {
+        Button(action: {
+            //add our action here
+        }) {
+            HStack(spacing: 0) {
+                Image(systemName: "checkmark")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 12, height: 12)
+                    .foregroundColor(.black)
+                    .padding(.leading, UIScreen.main.bounds.width * 0.02) // 2% of screen width
+                    .padding(.trailing, 0)
+                    .padding(.vertical, 8)
+                
+                Text("Detail #1")
+                    .font(Theme.Typography.largeText)
+                    .foregroundColor(Theme.Typography.largeTextColor)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, UIScreen.main.bounds.width * 0.04) // 4% of screen width
+            }
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.white)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+        )
+        .fixedSize(horizontal: true, vertical: false)
+        .frame(minWidth: UIScreen.main.bounds.width * 0.25) // 25% of screen width minimum
+        .frame(height: 36)
+    }
+}
+
+struct ReviewIconsHStack: View {
+    var body: some View {
+        HStack(spacing: 8) {
+            ReviewIconsTemplate()
+            ReviewIconsTemplate()
+            ReviewIconsTemplate()
+        }
+        .padding(.leading, UIScreen.main.bounds.width * 0.06)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+struct Description: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Things to consider")
+                .font(Theme.Typography.smallerTitle)
+                .foregroundColor(Theme.Typography.smallerTitleColor)
+            
+            Text("Battery life is limited (2-3 hours). Fit may vary; try before buying. Ideal for standalone VR but lacks PC-level graphics. Check app library, comfort, and storage capacity.")
+                .font(Theme.Typography.largeText)
+                .foregroundStyle(Theme.Typography.largeTextColor)
+                .frame(width: UIScreen.main.bounds.width * 0.88, alignment: .leading) // Control text width
+        }
+        .padding(.leading, UIScreen.main.bounds.width * 0.06)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+struct Company: View {
     var body: some View {
         HStack {
-            Image(systemName: "star")
-                .padding()
-            Image(systemName: "bell")
-                .padding()
-            Image(systemName: "globe")
-                .padding()
+            // Left side content
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(Theme.companyColorGreen)
+                    .frame(width: 42, height: 42)
+                    .overlay(
+                        Text("7.2")
+                            .font(Theme.Typography.companyText)
+                            .foregroundStyle(Theme.Typography.companyTextColor)
+                    )
+                
+                VStack(spacing: 4) {
+                    Text("Company Title")
+                        .font(Theme.Typography.smallerTitle)
+                        .foregroundStyle(Theme.Typography.smallerTitleColor)
+                    
+                    Text("Company Genre")
+                        .font(Theme.Typography.smallBody)
+                        .foregroundStyle(Theme.Typography.smallBodyColor)
+                }
+            }
+            .padding(.leading, UIScreen.main.bounds.width * 0.06) // Left padding
+            
+            Spacer() // Push content to sides
+            
+            // Right side content
+            Text("Trusted")
+                .font(Theme.Typography.companyText)
+                .foregroundStyle(Theme.Typography.largeTextColor)
+                .padding(.trailing, UIScreen.main.bounds.width * 0.06) // Right padding
         }
+        .frame(maxWidth: .infinity) // Ensure HStack takes full width
     }
 }
 
