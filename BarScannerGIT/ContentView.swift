@@ -2,18 +2,30 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedTab: Int = 0
+    @State private var showingBottomSheet = false
     @StateObject private var cameraViewModel = CameraViewModel()
     
     var body: some View {
         ZStack {
+            // Main content
             switch selectedTab {
             case 0:
                 HomeView()
+                    .sheet(isPresented: $showingBottomSheet) {
+                        BottomSheetView()
+                            .presentationDetents([
+                                .fraction(0.3),
+                                .fraction(0.8)
+                            ])
+                            .presentationBackground(.white)
+                            .presentationCornerRadius(20)
+                            .presentationDragIndicator(.visible)
+                    }
+                    .zIndex(1) // Bottom sheet above main content
             case 1:
                 Text("Search")
             case 2:
                 Text("Camera view")
-    
             case 3:
                 Text("Notifications")
             case 4:
@@ -22,10 +34,13 @@ struct ContentView: View {
                 Text("Unknown Tab")
             }
             
+            // Tab bar always on top
             VStack {
                 Spacer()
                 CustomTabBar(selectedTab: $selectedTab)
             }
+            .ignoresSafeArea(.keyboard)
+            .zIndex(2) // Tab bar above everything
         }
     }
 }
@@ -72,18 +87,10 @@ struct BottomSheetView: View {
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 24) {
-                Color.clear.frame(height: 8)
+                Color.clear.frame(height: 12)
                 
-                VStack(spacing: 16){
-                    ProductInfoSection()
-                    
-                    Rectangle()
-                        .frame(width: UIScreen.main.bounds.width * 0.8, height: 1)
-                        .foregroundColor(Theme.spacerline)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                }
+                ProductInfoSection()
             
-                
                 DetailsStack()
                                 
                 Description()
@@ -99,6 +106,18 @@ struct BottomSheetView: View {
 
 // Main product info section
 struct ProductInfoSection: View {
+    var body: some View {
+        VStack(spacing: 20){
+            ProductInfoSectionComponent()
+            
+            Rectangle()
+                .frame(width: UIScreen.main.bounds.width * 0.9, height: 1)
+                .foregroundColor(Theme.spacerline)
+                .frame(maxWidth: .infinity, alignment: .center)
+        }
+    }
+}
+struct ProductInfoSectionComponent: View {
     var body: some View {
         HStack {
             ProductImage()
@@ -145,19 +164,20 @@ struct ProductTitleSection: View {
                     .foregroundColor(Theme.Typography.titleColor)
                 
                 Spacer()
-                Spacer()
                 
                 Text("$299")
                     .font(Theme.Typography.subtitle)
-                    .foregroundStyle(Theme.Typography.subtitleColor)
-                    .padding(.trailing, UIScreen.main.bounds.width * 0.1)
+                    .foregroundStyle(Theme.Typography.titleColor)
+                    
+
+
             }
             
             Text("Meta")
                 .font(Theme.Typography.largeText)
                 .foregroundColor(Theme.Typography.largeTextColor)
         }
-        .padding(.top, 8)
+        .padding(.trailing, UIScreen.main.bounds.width * 0.05)
     }
 }
 
@@ -219,22 +239,6 @@ struct ReviewSection: View {
             }
         }
         .padding(.top, 4)
-    }
-}
-
-
-// Review sources section
-struct ReviewSourcesSection: View {
-    var body: some View {
-        HStack {
-            VStack(alignment: .trailing, spacing: 4) {
-                ReviewSourceCircles()
-                
-                Text("12,302 reviews")
-                    .font(Theme.Typography.smallBody)
-                    .foregroundStyle(Theme.Typography.smallBodyColor)
-            }
-        }
     }
 }
 
@@ -469,5 +473,6 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
+
 
 
