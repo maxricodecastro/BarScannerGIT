@@ -10,6 +10,7 @@ final class CameraViewModel: ObservableObject {
     @Published var isScanning = true
     @Published var showBottomSheet = false
     @Published var showNoProductSheet = false
+    @Published var isLoading = false
     
     private let barcodeService: BarcodeServiceProtocol
     var bottomSheetViewModel: BottomSheetViewModel?
@@ -26,8 +27,8 @@ final class CameraViewModel: ObservableObject {
         scannedBarcode = barcode
         isScanning = false
         productName = "Loading..."
+        isLoading = true
         
-        // Remove only one leading zero for UPC-A format
         let trimmedBarcode = barcode.hasPrefix("0") ? String(barcode.dropFirst()) : barcode
         print("Trimmed barcode for API: \(trimmedBarcode)")
         
@@ -46,6 +47,7 @@ final class CameraViewModel: ObservableObject {
                 print("Error occurred: \(error)")
                 productName = "Scan a product"
             }
+            isLoading = false
             isScanning = true
         }
     }
@@ -158,7 +160,7 @@ struct CameraViewWithOverlay: View {
             VStack {
                 ProductNameHeader(name: viewModel.productName)
                 Spacer()
-                ScannerOverlay()
+                ScannerOverlay(viewModel: viewModel)
                 Spacer()
                 BarcodeFooter(code: viewModel.scannedBarcode)
             }
@@ -198,14 +200,63 @@ private struct ProductNameHeader: View {
 }
 
 private struct ScannerOverlay: View {
+    @ObservedObject var viewModel: CameraViewModel
+    @State private var showLoader = false
+    @State private var loaderRef: LoaderView? = nil
+    
     var body: some View {
-        RoundedRectangle(cornerRadius: 12)
-            .stroke(Color.white, lineWidth: 6)
-            .frame(
-                width: UIScreen.main.bounds.width * 0.6,
-                height: UIScreen.main.bounds.width * 0.36
-            )
-            .background(Color.clear)
+        Group {
+            if showLoader {
+                LoaderView { 
+                    // Animation completed callback
+                    showLoader = false
+                }
+            } else {
+                // Static rectangle using LoaderView's style
+                ZStack {
+                    // Top Line
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(.white)
+                        .frame(width: width, height: 10)
+                        .offset(y: -height/2 + 5)
+                    
+                    // Right Line
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(.white)
+                        .frame(width: 10, height: height)
+                        .offset(x: width/2 - 5)
+                    
+                    // Bottom Line
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(.white)
+                        .frame(width: width, height: 10)
+                        .offset(y: height/2 - 5)
+                    
+                    // Left Line
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(.white)
+                        .frame(width: 10, height: height)
+                        .offset(x: -width/2 + 5)
+                }
+                .frame(width: width, height: height)
+            }
+        }
+        .onChange(of: viewModel.isLoading) { wasLoading, isLoading in
+            if isLoading {
+                showLoader = true
+            } else {
+                // Just set showLoader to false directly
+                showLoader = false
+            }
+        }
+    }
+    
+    private var width: CGFloat {
+        UIScreen.main.bounds.width * 0.6
+    }
+    
+    private var height: CGFloat {
+        UIScreen.main.bounds.width * 0.36
     }
 }
 
@@ -221,5 +272,84 @@ private struct BarcodeFooter: View {
             .cornerRadius(10)
             .padding(.bottom, 50)
     }
+}
+
+// Add this preview helper struct
+struct CameraViewWithOverlayPreview: View {
+    @StateObject private var viewModel = CameraViewModel()
+    
+    var body: some View {
+        ZStack {
+            Color.black
+                .ignoresSafeArea()
+            
+            VStack {
+                ProductNameHeader(name: viewModel.productName)
+                Spacer()
+                ScannerOverlay(viewModel: viewModel)
+                Spacer()
+                BarcodeFooter(code: viewModel.scannedBarcode)
+            }
+            .overlay(
+                Button("Toggle Loading") {
+                    viewModel.isLoading.toggle()
+                }
+                .foregroundColor(.white)
+                .padding()
+                .background(Color.blue)
+                .cornerRadius(8)
+                .padding(),
+                alignment: .bottom
+            )
+        }
+    }
+}
+
+// Add this test preview struct
+struct CameraViewLoadingTestPreview: View {
+    @StateObject private var viewModel = CameraViewModel()
+    
+    var body: some View {
+        ZStack {
+            Color.black
+                .ignoresSafeArea()
+            
+            VStack {
+                ProductNameHeader(name: viewModel.productName)
+                Spacer()
+                ScannerOverlay(viewModel: viewModel)
+                Spacer()
+                BarcodeFooter(code: viewModel.scannedBarcode)
+            }
+            .overlay(
+                VStack {
+//                    // Test button to simulate barcode scan
+//                    Button("Simulate Barcode Scan") {
+//                        viewModel.handleScannedBarcode("123456789")
+//                    }
+//                    .foregroundColor(.white)
+//                    .padding()
+//                    .background(Color.blue)
+//                    .cornerRadius(8)
+                    
+                    // Manual loading toggle for testing
+                    /* Button("Toggle Loading") {
+                        viewModel.isLoading.toggle()
+                    }
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.green)
+                    .cornerRadius(8) */
+                }
+                .padding(),
+                alignment: .bottom
+            )
+        }
+        .environmentObject(BottomSheetViewModel())
+    }
+}
+
+#Preview {
+    CameraViewLoadingTestPreview()
 }
 
