@@ -100,7 +100,7 @@ struct BottomSheetData {
     
     // Example data
     static let example = BottomSheetData(
-        barcode: "305212750003",
+        barcode: "887276069623",
         productTitle: "Vaseline Lip Therapy",
         companyName: "Vaseline",
         reviewCount: 1230,

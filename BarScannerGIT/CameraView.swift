@@ -9,6 +9,7 @@ final class CameraViewModel: ObservableObject {
     @Published var errorMessage = ""
     @Published var isScanning = true
     @Published var showBottomSheet = false
+    @Published var showNoProductSheet = false
     
     private let barcodeService: BarcodeServiceProtocol
     var bottomSheetViewModel: BottomSheetViewModel?
@@ -33,16 +34,19 @@ final class CameraViewModel: ObservableObject {
         Task { @MainActor in
             do {
                 let data = try await BottomSheetData.fetch(barcode: trimmedBarcode)
-                bottomSheetViewModel?.updateData(data)
-                showBottomSheet = true
+                if data.productTitle.isEmpty {
+                    showNoProductSheet = true
+                } else {
+                    bottomSheetViewModel?.updateData(data)
+                    showBottomSheet = true
+                }
                 productName = "Scan a product"
             } catch {
+                showNoProductSheet = true
                 print("Error occurred: \(error)")
-                self.showAlert = true
-                self.errorMessage = "Error fetching product: \(error.localizedDescription)"
-                self.isScanning = true
                 productName = "Scan a product"
             }
+            isScanning = true
         }
     }
     
@@ -150,36 +154,16 @@ struct CameraViewWithOverlay: View {
     var body: some View {
         ZStack {
             CameraView(viewModel: viewModel)
-                .edgesIgnoringSafeArea(.all)
-                .onAppear {
-                    viewModel.bottomSheetViewModel = bottomSheetViewModel
-                }
             
             VStack {
+                ProductNameHeader(name: viewModel.productName)
                 Spacer()
                 ScannerOverlay()
-                Text(viewModel.productName)
-                    .font(.title2.bold())
-                    .foregroundColor(.white)
-                    .padding(.top, 4)
-                    .padding(.trailing, UIScreen.main.bounds.width * 0.2) // Aligns with rectangle's left edge
                 Spacer()
-                if !viewModel.scannedBarcode.isEmpty {
-                    BarcodeFooter(code: viewModel.scannedBarcode)
-                }
+                BarcodeFooter(code: viewModel.scannedBarcode)
             }
         }
-        .alert("Camera Error", isPresented: $viewModel.showAlert) {
-            Button("OK", role: .cancel) { 
-                viewModel.resetScanner()
-            }
-        } message: {
-            Text(viewModel.errorMessage)
-        }
-        .sheet(isPresented: .init(
-            get: { viewModel.showBottomSheet },
-            set: { viewModel.showBottomSheet = $0 }
-        )) {
+        .sheet(isPresented: $viewModel.showBottomSheet) {
             BottomSheetView()
                 .environmentObject(bottomSheetViewModel)
                 .presentationDetents([
@@ -187,9 +171,11 @@ struct CameraViewWithOverlay: View {
                     .fraction(0.8)
                 ])
                 .presentationBackground(.white)
-                .onDisappear {
-                    viewModel.resetScanner()
-                }
+        }
+        .sheet(isPresented: $viewModel.showNoProductSheet) {
+            NoProductSheet()
+                .presentationDetents([.fraction(0.25)])
+                .presentationBackground(.white)
         }
     }
 }

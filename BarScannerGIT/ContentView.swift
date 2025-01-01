@@ -12,7 +12,7 @@ struct ContentView: View {
             case 0:
                 HomeView()
             case 1:
-                Text("Search")
+                SearchView()
             case 2:
                 CameraViewWithOverlay()
                     .environmentObject(bottomSheetViewModel)
@@ -26,9 +26,36 @@ struct ContentView: View {
                             .presentationBackground(.white)
                     }
             case 3:
-                Text("Notifications")
+                NotificationsView()
             case 4:
-                Text("Profile")
+                VStack(alignment: .leading, spacing: 16) {
+                    
+                    Color.clear.frame(height: 8)
+                    
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Recommendations")
+                            .font(.title)
+                            .bold()
+                        
+                        Text("Recent product categories")
+                            .font(Theme.Typography.smallerTitle)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    TextCarouselView()
+                    
+                    
+                    Text("See our top choices")
+                        .font(Theme.Typography.smallerTitle)
+                        .foregroundColor(.secondary)
+                    
+                    ParallaxCarouselView()
+                    
+                    Color.clear.frame(height: 34)
+                    
+                }
+                .padding()
+                
             default:
                 Text("Unknown Tab")
             }
@@ -45,17 +72,83 @@ struct ContentView: View {
 
 struct HomeView: View {
     @State var showingBottomSheet = false
+    @State private var isLoading = false
+    @State private var showError = false
+    @State private var errorMessage = ""
     @StateObject private var viewModel = BottomSheetViewModel()
     
     var body: some View {
         VStack {
             Button(action: {
-                // Use example data directly
-                viewModel.updateData(BottomSheetData.example)
+                Task {
+                    isLoading = true
+                    do {
+                        let data = try await BottomSheetData.fetch(barcode: "887276069623")
+                        await MainActor.run {
+                            viewModel.updateData(data)
+                            showingBottomSheet = true
+                            isLoading = false
+                        }
+                    } catch {
+                        await MainActor.run {
+                            errorMessage = error.localizedDescription
+                            showError = true
+                            isLoading = false
+                        }
+                    }
+                }
+            }) {
+                HStack(spacing: 8) {
+                    if isLoading {
+                        ProgressView()
+                            .tint(.black)
+                    }
+                    Text(isLoading ? "Loading..." : "Test API Call")
+                        .font(.system(size: 14))
+                        .foregroundColor(.black)
+                }
+                .padding(.vertical, 8)
+                .padding(.horizontal, 12)
+                .background(Color.white)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                )
+                .cornerRadius(12)
+            }
+            .buttonStyle(.borderedProminent)
+            .alert("Error", isPresented: $showError) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(errorMessage)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Theme.background)
+        .sheet(isPresented: $showingBottomSheet) {
+            BottomSheetView()
+                .environmentObject(viewModel)
+                .presentationDetents([
+                    .fraction(0.25),
+                    .fraction(0.8)
+                ])
+                .presentationBackground(.white)
+        }
+    }
+}
+
+struct SearchView: View {
+    @State var showingBottomSheet = false
+    @StateObject private var viewModel = BottomSheetViewModel()
+    
+    var body: some View {
+        VStack {
+            Button(action: {
+                viewModel.data = BottomSheetData.example
                 showingBottomSheet = true
             }) {
                 HStack(spacing: 8) {
-                    Text("Show Product Info")
+                    Text("Test UI with Example Data")
                         .font(.system(size: 14))
                         .foregroundColor(.black)
                 }
@@ -84,7 +177,6 @@ struct HomeView: View {
     }
 }
 
-
 //content of the sheet
 struct BottomSheetView: View {
     @EnvironmentObject var viewModel: BottomSheetViewModel
@@ -106,7 +198,7 @@ struct BottomSheetView: View {
 // Main product info section
 struct ProductInfoSection: View {
     var body: some View {
-        VStack(spacing: 20){
+        VStack(spacing: 44){
             ProductInfoSectionComponent()
             
             Rectangle()
@@ -140,7 +232,7 @@ struct ProductImage: View {
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .frame(width: 100, height: 150)
+                    .frame(width: 117, height: 142)
                     .background(Color.gray.opacity(0.2))
                     .clipped()
                     .cornerRadius(10)
@@ -168,7 +260,7 @@ struct ProductImage: View {
 // Product details component
 struct ProductDetails: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             ProductTitleSection()
             RatingStars()
         }
@@ -182,19 +274,20 @@ struct ProductTitleSection: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .firstTextBaseline) {
+            HStack(alignment: .firstTextBaseline, spacing: 16) {
                 Text(viewModel.data.productTitle)
                     .font(Theme.Typography.title)
                     .foregroundColor(Theme.Typography.titleColor)
                     .lineLimit(3)
+                    .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
                 
-                Spacer()
-
+                Spacer(minLength: 16)
                 
                 Text(viewModel.data.price)
                     .font(Theme.Typography.subtitle)
                     .foregroundStyle(Theme.Typography.titleColor)
-                    .frame(maxWidth: UIScreen.main.bounds.width * 0.1)
+                    .frame(minWidth: UIScreen.main.bounds.width * 0.15)
+                    .lineLimit(1)
             }
             
             Text(viewModel.data.companyName)
@@ -210,12 +303,11 @@ struct RatingStars: View {
     @EnvironmentObject var viewModel: BottomSheetViewModel
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 0) {
             Button(action: {
                 // Action here if needed
             }) {
-                HStack(spacing: 8) {
-                    
+                HStack(spacing: 4) {
                     HStack(spacing: 4) {
                         Image(systemName: "star.fill")
                             .resizable()
@@ -227,7 +319,6 @@ struct RatingStars: View {
                             .font(Theme.Typography.starsText)
                             .foregroundColor(Theme.Typography.starsTextColor)
                     }
-                   
                     
                     Text("Great buy")
                         .font(Theme.Typography.recommendedText)
@@ -237,46 +328,23 @@ struct RatingStars: View {
                 .padding(.vertical, 8)
                 .background(Theme.companyColorGreen)
                 .cornerRadius(24)
-                
-                
             }
-            HStack{
-                Text(viewModel.data.reviewCountFormatted + " reviews")
-                    .font(Theme.Typography.smallBody)
-                    .foregroundStyle(Theme.Typography.smallBodyColor)
-                
-                Spacer()
-                    
-                ReviewSourceCircles()
 
+            
+            VStack(spacing: 0) {
+                HStack {
+                    Text(viewModel.data.reviewCountFormatted + " reviews")
+                        .font(Theme.Typography.reviewBody)
+                        .foregroundStyle(Color(hex: "9E9E9E"))
+                    
+                    Spacer()
+                    
+                    ReviewSourceCircles()
+                        .offset(y:24)
+                }
             }
             .padding(.trailing, UIScreen.main.bounds.width * 0.05)
-            
-            
         }
-        
-    }
-}
-
-// Review section component
-struct ReviewSection: View {
-    @EnvironmentObject var viewModel: BottomSheetViewModel
-    
-    var body: some View {
-        HStack {
-            Text("Recommended")
-                .font(Theme.Typography.largeText)
-                .foregroundColor(Theme.Typography.largeTextColor)
-            
-            VStack(alignment: .trailing, spacing: 4) {
-                ReviewSourceCircles()
-                
-                Text(viewModel.data.reviewCountFormatted)
-                    .font(Theme.Typography.smallBody)
-                    .foregroundStyle(Theme.Typography.smallBodyColor)
-            }
-        }
-        .padding(.top, 4)
     }
 }
 
@@ -376,7 +444,7 @@ struct AmazonButton: View {
 
 struct DetailsStack: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             BuyersHaveToSay()
             VStack(alignment: .leading, spacing: 8) {
                 ReviewProsHStack()
@@ -407,21 +475,19 @@ struct ReviewProsTemplate: View {
         Button(action: {
             //add our action here
         }) {
-            HStack(spacing: 0) {
-                Image(systemName: "checkmark")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 12, height: 12)
-                    .foregroundColor(.black)
-                    .padding(.leading, UIScreen.main.bounds.width * 0.02)
-                    .padding(.trailing, 0)
+            HStack(spacing: 12) { // Adjust circle-to-text spacing here
+                Circle()
+                    .fill(Theme.companyColorGreen)
+                    .frame(width: 8, height: 8)
+                    .padding(.leading, UIScreen.main.bounds.width * 0.04)
+                    .padding(.trailing, 4)
                     .padding(.vertical, 8)
                 
                 Text(text)
-                    .font(Theme.Typography.reviewText)
+                    .font(Theme.Typography.smallBody)
                     .foregroundColor(Theme.Typography.reviewTextColor)
                     .padding(.vertical, 8)
-                    .padding(.horizontal, UIScreen.main.bounds.width * 0.04)
+                    .padding(.trailing, UIScreen.main.bounds.width * 0.04)
             }
         }
         .background(
@@ -445,21 +511,19 @@ struct ReviewConsTemplate: View {
         Button(action: {
             //add our action here
         }) {
-            HStack(spacing: 0) {
-                Image(systemName: "xmark")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 12, height: 12)
-                    .foregroundColor(.black)
-                    .padding(.leading, UIScreen.main.bounds.width * 0.02)
-                    .padding(.trailing, 0)
+            HStack(spacing: 12) { // Match spacing with pros template
+                Circle()
+                    .fill(Theme.CompanyColorRed)
+                    .frame(width: 8, height: 8)
+                    .padding(.leading, UIScreen.main.bounds.width * 0.04)
+                    .padding(.trailing, 4)
                     .padding(.vertical, 8)
                 
                 Text(text)
-                    .font(Theme.Typography.reviewText)
+                    .font(Theme.Typography.smallBody)
                     .foregroundColor(Theme.Typography.reviewTextColor)
                     .padding(.vertical, 8)
-                    .padding(.horizontal, UIScreen.main.bounds.width * 0.04)
+                    .padding(.trailing, UIScreen.main.bounds.width * 0.04)
             }
         }
         .background(
@@ -562,7 +626,7 @@ struct Description: View {
     @EnvironmentObject var viewModel: BottomSheetViewModel
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("Things to consider")
                 .font(Theme.Typography.smallerTitle)
                 .foregroundColor(Theme.Typography.smallerTitleColor)
@@ -581,39 +645,75 @@ struct Company: View {
     @EnvironmentObject var viewModel: BottomSheetViewModel
     
     var body: some View {
-        HStack {
-            // Left side content	
-            HStack(spacing: 8) {
-                Circle()
-                    .fill(Theme.companyColorGreen)
-                    .frame(width: 42, height: 42)
-                    .overlay(
-                        Text(viewModel.data.companyValueFormatted)
-                            .font(Theme.Typography.companyText)
-                            .foregroundStyle(Theme.Typography.companyTextColor)
-                    )
-                
-                VStack(spacing: 4) {
-                    Text(viewModel.data.companyTitle)
-                        .font(Theme.Typography.smallerTitle)
-                        .foregroundStyle(Theme.Typography.smallerTitleColor)
+        VStack {
+            Color.clear.frame(height: 4)
+
+            HStack {
+                // Left side content
+                HStack(spacing: 0) { // Changed spacing to 0
+                    Circle()
+                        .fill(Theme.companyColorGreen)
+                        .frame(width: 42, height: 42)
+                        .overlay(
+                            Text(viewModel.data.companyValueFormatted)
+                                .font(Theme.Typography.companyText)
+                                .foregroundStyle(Theme.Typography.companyTextColor)
+                        )
                     
-                    Text(viewModel.data.companyGenre)
-                        .font(Theme.Typography.smallBody)
-                        .foregroundStyle(Theme.Typography.smallBodyColor)
+                    VStack(alignment: .leading, spacing: 4) { // Added alignment: .leading
+                        Text(viewModel.data.companyTitle)
+                            .font(Theme.Typography.smallerTitle)
+                            .foregroundStyle(Theme.Typography.smallerTitleColor)
+                        
+                        Text(viewModel.data.companyGenre)
+                            .font(Theme.Typography.smallBody)
+                            .foregroundStyle(Theme.Typography.smallBodyColor)
+                    }
+                    .padding(.leading, 8) // Added small padding after circle
                 }
+                .padding(.leading, UIScreen.main.bounds.width * 0.06)
+                
+                Spacer()
+                
+                Text(viewModel.data.companyTrust)
+                    .font(Theme.Typography.companyText)
+                    .foregroundStyle(Theme.Typography.largeTextColor)
+                    .padding(.trailing, UIScreen.main.bounds.width * 0.06)
             }
-            .padding(.leading, UIScreen.main.bounds.width * 0.06) // Left padding
-            
-            Spacer() // Push content to sides
-            
-            // Right side content
-            Text(viewModel.data.companyTrust)
-                .font(Theme.Typography.companyText)
-                .foregroundStyle(Theme.Typography.largeTextColor)
-                .padding(.trailing, UIScreen.main.bounds.width * 0.06) // Right padding
         }
-        .frame(maxWidth: .infinity) // Ensure HStack takes full width
+        
+        .frame(maxWidth: .infinity)
+    }
+}
+
+struct NotificationsView: View {
+    @State private var showingNoProductSheet = false
+    
+    var body: some View {
+        VStack {
+            Button(action: {
+                showingNoProductSheet = true
+            }) {
+                Text("Test No Product Sheet")
+                    .font(.system(size: 14))
+                    .foregroundColor(.black)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 12)
+                    .background(Color.white)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                    )
+                    .cornerRadius(12)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Theme.background)
+        .sheet(isPresented: $showingNoProductSheet) {
+            NoProductSheet()
+                .presentationDetents([.fraction(0.25)])
+                .presentationBackground(.white)
+        }
     }
 }
 

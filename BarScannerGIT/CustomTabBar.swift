@@ -4,38 +4,31 @@ struct CustomTabBar: View {
     @Binding var selectedTab: Int
     
     var body: some View {
-        HStack {
-            Spacer()
-            
+        HStack(spacing: 0) {
             TabBarButton(imageName: "house.fill", text: "Home", isSelected: selectedTab == 0) {
                 selectedTab = 0
             }
-            
-            Spacer()
+            .frame(maxWidth: .infinity)
             
             TabBarButton(imageName: "magnifyingglass", text: "Search", isSelected: selectedTab == 1) {
                 selectedTab = 1
             }
-            
-            Spacer()
+            .frame(maxWidth: .infinity)
             
             TabBarButton(imageName: "camera.fill", text: "Scan", isSelected: selectedTab == 2) {
                 selectedTab = 2
             }
-            
-            Spacer()
+            .frame(maxWidth: .infinity)
             
             TabBarButton(imageName: "bell.fill", text: "Notifications", isSelected: selectedTab == 3) {
                 selectedTab = 3
             }
-            
-            Spacer()
+            .frame(maxWidth: .infinity)
             
             TabBarButton(imageName: "person.fill", text: "Profile", isSelected: selectedTab == 4) {
                 selectedTab = 4
             }
-            
-            Spacer()
+            .frame(maxWidth: .infinity)
         }
         .padding(.vertical, 8)
         .background(Theme.background)

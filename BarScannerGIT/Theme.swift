@@ -39,7 +39,7 @@ struct Theme {
         static let smallBodyColor = Color(hex: "BABABA")
         
         //Company Text - 12px SF Pro Regular - White
-        static let companyText = Font.system(size: 14, weight: .regular)
+        static let companyText = Font.system(size: 14, weight: .bold)
         static let companyTextColor = Color.white
         
         //Review Text - 12px SF Pro Regular - Black
@@ -53,6 +53,10 @@ struct Theme {
         //Stars Text - 12px SF Pro Semibold - Black
         static let starsText = Font.system(size: 14, weight: .bold)
         static let starsTextColor = Color.white
+        
+        //Reviews Numer Text - 12px SF Pro Regular - #BABABA
+        static let reviewBody = Font.system(size: 12, weight : .regular)
+        static let reviewBodyColor = Color(hex: "BABABA")
     }
     
     struct Images {
