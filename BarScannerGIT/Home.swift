@@ -9,31 +9,38 @@ import SwiftUI
 
 struct HomePage: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) { 
-            Color.clear.frame(height: 8)
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Recommendations")
-                    .font(.title)
-                    .bold()
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Recommendations")
+                        .font(.title)
+                        .bold()
+                }
+                 .padding(.top, 36) // Small top padding
+
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Recent product categories")
+                        .font(Theme.Typography.smallerTitle)
+                        .foregroundColor(.secondary)
+
+                        TextCarouselView()
+                }
+               
                 
-                Text("Recent product categories")
-                    .font(Theme.Typography.smallerTitle)
-                    .foregroundColor(.secondary)
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("See our top choices")
+                        .font(Theme.Typography.smallerTitle)
+                        .foregroundColor(.secondary)
+                    
+                    ParallaxCarouselView()
+                        .frame(height: 320)
+                }
+                
+                Color.white.frame(height: 34)  // Bottom padding
             }
-            
-            TextCarouselView()
-            
-            Text("See our top choices")
-                .font(Theme.Typography.smallerTitle)
-                .foregroundColor(.secondary)
-            
-            ParallaxCarouselView()
-                .frame(height: 320)
-            
-            Color.clear.frame(height: 34)
+            .padding(.horizontal)
         }
-        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.white)
         .environment(\.colorScheme, .light)
     }

@@ -11,6 +11,8 @@ struct ContentView: View {
             switch selectedTab {
             case 0:
                 HomePage()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.white)
             case 1:
                 SearchView()
             case 2:
@@ -28,9 +30,7 @@ struct ContentView: View {
             case 3:
                 NotificationsView()
             case 4:
-                
                 HomeView()
-                
             default:
                 Text("Unknown Tab")
             }
@@ -42,6 +42,7 @@ struct ContentView: View {
             .ignoresSafeArea(.keyboard)
             .zIndex(2)
         }
+        .background(Color.white)
     }
 }
 
