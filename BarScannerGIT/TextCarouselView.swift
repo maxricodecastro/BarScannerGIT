@@ -35,6 +35,7 @@ struct TextCardView: View {
     let card: TextCarouselView.TextCard
     let paddingConstant: CGFloat = 10
     let cornerRadiusConstant: CGFloat = 20
+    @State private var showRecentRecs = false
     
     var body: some View {
         ZStack(alignment: .bottomLeading) {
@@ -64,7 +65,7 @@ struct TextCardView: View {
                 HStack {
                     Spacer()
                     CircleButton(iconName: "arrow.up.right") {
-                        // Action here
+                        showRecentRecs = true
                     }
                     .padding(.top, 16)
                     .padding(.trailing, 16)
@@ -74,6 +75,19 @@ struct TextCardView: View {
         }
         .frame(width: 160, height: 200)
         .clipShape(RoundedRectangle(cornerRadius: cornerRadiusConstant))
+        .onTapGesture {
+            showRecentRecs = true
+        }
+        .fullScreenCover(isPresented: $showRecentRecs) {
+            RecentRecs(recommendations: RecommendationList(
+                searchedProduct: RecommendationList.SearchedProduct(
+                    title: card.title,
+                    imageUrl: card.backgroundImage,
+                    sourceCount: 8
+                ),
+                products: RecommendationList.sample.products
+            ))
+        }
     }
 }
 

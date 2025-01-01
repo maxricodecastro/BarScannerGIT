@@ -14,7 +14,7 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(Color.white)
             case 1:
-                SearchView()
+                Search()
             case 2:
                 CameraViewWithOverlay()
                     .environmentObject(bottomSheetViewModel)
@@ -28,7 +28,7 @@ struct ContentView: View {
                             .presentationBackground(.white)
                     }
             case 3:
-                NotificationsView()
+                Lists()
             case 4:
                 HomeView()
             default:

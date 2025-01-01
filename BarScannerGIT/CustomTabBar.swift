@@ -20,7 +20,7 @@ struct CustomTabBar: View {
             }
             .frame(maxWidth: .infinity)
             
-            TabBarButton(imageName: "bell.fill", text: "Notifications", isSelected: selectedTab == 3) {
+            TabBarButton(imageName: "list.bullet", text: "History", isSelected: selectedTab == 3) {
                 selectedTab = 3
             }
             .frame(maxWidth: .infinity)
