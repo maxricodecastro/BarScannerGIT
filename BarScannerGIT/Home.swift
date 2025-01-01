@@ -9,10 +9,10 @@ import SwiftUI
 
 struct HomePage: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 16) { 
             Color.clear.frame(height: 8)
             
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text("Recommendations")
                     .font(.title)
                     .bold()
@@ -34,6 +34,8 @@ struct HomePage: View {
             Color.clear.frame(height: 34)
         }
         .padding()
+        .background(Color.white)
+        .environment(\.colorScheme, .light)
     }
 }
 

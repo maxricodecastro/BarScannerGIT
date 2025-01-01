@@ -12,6 +12,9 @@ struct ParallaxCarouselView: View {
         CarouselContent(selectedCard: $selectedCard)
             .fullScreenCover(item: $selectedCard) { card in
                 NewsArticleView(article: card.article, selectedCard: $selectedCard)
+                    .background(Color.white)
+                    .environment(\.colorScheme, .light) // Force light mode
+
             }
     }
 }

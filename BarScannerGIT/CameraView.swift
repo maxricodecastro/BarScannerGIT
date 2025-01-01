@@ -34,17 +34,22 @@ final class CameraViewModel: ObservableObject {
         
         Task { @MainActor in
             do {
+                print("Fetching product info for barcode: \(trimmedBarcode)")
                 let data = try await BottomSheetData.fetch(barcode: trimmedBarcode)
-                if data.productTitle.isEmpty {
-                    showNoProductSheet = true
-                } else {
+                print("Successfully fetched data: \(data.productTitle)")
+                
+                if !data.productTitle.isEmpty {
+                    print("Updating bottom sheet with product: \(data.productTitle)")
                     bottomSheetViewModel?.updateData(data)
                     showBottomSheet = true
+                } else {
+                    print("No product title found, showing no product sheet")
+                    showNoProductSheet = true
                 }
                 productName = "Scan a product"
             } catch {
+                print("Error fetching product: \(error)")
                 showNoProductSheet = true
-                print("Error occurred: \(error)")
                 productName = "Scan a product"
             }
             isLoading = false
@@ -165,6 +170,9 @@ struct CameraViewWithOverlay: View {
                 BarcodeFooter(code: viewModel.scannedBarcode)
             }
         }
+        .onAppear {
+            viewModel.bottomSheetViewModel = bottomSheetViewModel
+        }
         .sheet(isPresented: $viewModel.showBottomSheet) {
             BottomSheetView()
                 .environmentObject(bottomSheetViewModel)
@@ -173,11 +181,15 @@ struct CameraViewWithOverlay: View {
                     .fraction(0.8)
                 ])
                 .presentationBackground(.white)
+                .background(Color.white)
+                .environment(\.colorScheme, .light)
         }
         .sheet(isPresented: $viewModel.showNoProductSheet) {
             NoProductSheet()
                 .presentationDetents([.fraction(0.25)])
                 .presentationBackground(.white)
+                .background(Color.white)
+                .environment(\.colorScheme, .light)
         }
     }
 }

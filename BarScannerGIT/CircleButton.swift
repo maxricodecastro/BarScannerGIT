@@ -17,7 +17,6 @@ struct CircleButton: View {
                             Circle()
                                 .stroke(.white.opacity(0.3), lineWidth: 1)
                         }
-                        .blur(radius: 10)
                 }
                 .background {
                     Circle()

@@ -10,7 +10,7 @@ struct ContentView: View {
         ZStack {
             switch selectedTab {
             case 0:
-                HomeView()
+                HomePage()
             case 1:
                 SearchView()
             case 2:
@@ -28,7 +28,8 @@ struct ContentView: View {
             case 3:
                 NotificationsView()
             case 4:
-                HomePage()
+                
+                HomeView()
                 
             default:
                 Text("Unknown Tab")
