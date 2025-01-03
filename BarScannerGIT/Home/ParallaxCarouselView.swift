@@ -44,10 +44,10 @@ struct CarouselContent: View {
 // Separate view for the carousel stack
 struct CarouselStack: View {
     @Binding var selectedCard: Card?
-    let horizontalPadding: CGFloat = 14
+    let horizontalPadding: CGFloat = 28
     
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 20) {
             ForEach(Card.cards) { card in
                 CarouselCard(card: card, selectedCard: $selectedCard)
             }
@@ -77,7 +77,7 @@ struct CarouselCard: View {
         }
         .frame(width: 225, height: 320)
         .scrollTransition(.interactive, axis: .horizontal) { view, phase in
-            view.scaleEffect(phase.isIdentity ? 1 : 0.90)
+            view.scaleEffect(phase.isIdentity ? 1 : 0.85)
         }
     }
 }

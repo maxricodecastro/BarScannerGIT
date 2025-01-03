@@ -14,14 +14,36 @@ final class CameraViewModel: ObservableObject {
     
     private let barcodeService: BarcodeServiceProtocol
     var bottomSheetViewModel: BottomSheetViewModel?
+    private let hapticFeedback = UINotificationFeedbackGenerator()
     
     init(barcodeService: BarcodeServiceProtocol = BarcodeService()) {
         self.barcodeService = barcodeService
         print("CameraViewModel initialized")
+        print("Preparing haptic engine...")
+        hapticFeedback.prepare()
     }
     
     func handleScannedBarcode(_ barcode: String) {
         guard isScanning else { return }
+        
+        print("Attempting to trigger haptic feedback...")
+        
+        // Try different haptic approaches
+        DispatchQueue.main.async {
+            print("Executing haptic feedback on main thread...")
+            
+            // Try notification feedback
+            self.hapticFeedback.notificationOccurred(.success)
+            print("Notification haptic triggered")
+            
+            // Also try impact feedback as a backup
+            let impact = UIImpactFeedbackGenerator(style: .medium)
+            impact.prepare()
+            impact.impactOccurred()
+            print("Impact haptic triggered")
+            
+            self.hapticFeedback.prepare()
+        }
         
         print("Original scanned barcode: \(barcode)")
         scannedBarcode = barcode
@@ -189,7 +211,7 @@ struct CameraViewWithOverlay: View {
                 .presentationDetents([.fraction(0.25)])
                 .presentationBackground(.white)
                 .background(Color.white)
-                .environment(\.colorScheme, .light)
+                    .environment(\.colorScheme, .light)
         }
     }
 }
@@ -320,6 +342,7 @@ struct CameraViewWithOverlayPreview: View {
 // Add this test preview struct
 struct CameraViewLoadingTestPreview: View {
     @StateObject private var viewModel = CameraViewModel()
+    @StateObject private var bottomSheetViewModel = BottomSheetViewModel()
     
     var body: some View {
         ZStack {
@@ -357,11 +380,12 @@ struct CameraViewLoadingTestPreview: View {
                 alignment: .bottom
             )
         }
-        .environmentObject(BottomSheetViewModel())
+        .environmentObject(bottomSheetViewModel)
     }
 }
 
 #Preview {
     CameraViewLoadingTestPreview()
+        .environmentObject(BottomSheetViewModel())
 }
 

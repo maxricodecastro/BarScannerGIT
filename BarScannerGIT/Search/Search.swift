@@ -5,9 +5,9 @@ struct Search: View {
     
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 24) {
                 // Title Section
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text("Search")
                         .font(.system(size: 34, weight: .bold))
                         .foregroundStyle(.primary)
@@ -16,8 +16,8 @@ struct Search: View {
                         .font(.system(size: 20))
                         .foregroundStyle(.secondary)
                 }
-                .padding(.top, 36)
-                .padding(.horizontal)
+                .padding(.horizontal, 32)
+                .padding(.top, 8)
                 
                 // Search Bar
                 HStack {

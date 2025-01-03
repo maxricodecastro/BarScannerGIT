@@ -26,7 +26,7 @@ struct TextCarouselView: View {
                     TextCardView(card: card)
                 }
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 28)
         }
     }
 }

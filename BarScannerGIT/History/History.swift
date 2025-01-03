@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct Lists: View {
+struct History: View {
     let productList = ProductList.sampleList
     
     var body: some View {
@@ -68,5 +68,5 @@ struct ProductListItemView: View {
 }
 
 #Preview {
-    Lists()
-} 
+    History()
+}
